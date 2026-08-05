@@ -32,9 +32,6 @@ jobs:
       - run: npm ci
       - run: npm run build
       - uses: actions/configure-pages@v5
-        with:
-          # 优化：首次运行时自动为仓库启用 GitHub Pages，避免 Pages 尚未创建导致 404。
-          enablement: true
       - uses: actions/upload-pages-artifact@v3
         with:
           path: ./out
