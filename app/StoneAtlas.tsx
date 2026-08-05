@@ -1,0 +1,111 @@
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
+import { chineseNameForStone } from "./stoneKnowledge";
+import type { StoneDomain } from "./stoneRecognition";
+
+type GalleryMetadata = {
+  references: Record<string, string[]>;
+};
+
+type AtlasItem = {
+  className: string;
+  domain: StoneDomain;
+  image: string;
+};
+
+const categories: Array<{
+  domain: StoneDomain;
+  count: number;
+  name: string;
+  english: string;
+  description: string;
+}> = [
+  { domain: "gemstone", count: 87, name: "彩色宝石", english: "COLORED GEMSTONES", description: "从钻石、红蓝宝石到小众彩宝" },
+  { domain: "jade_raw", count: 10, name: "玉石原石", english: "RAW JADE", description: "保留皮壳、纹理与天然形态" },
+  { domain: "common_rock", count: 9, name: "普通岩石", english: "COMMON ROCKS", description: "帮助排除外观相近的普通石头" },
+];
+
+export default function StoneAtlas() {
+  const [items, setItems] = useState<AtlasItem[]>([]);
+  const [activeDomain, setActiveDomain] = useState<StoneDomain | null>(null);
+
+  useEffect(() => {
+    fetch("/model/gallery-metadata.json")
+      .then((response) => response.json())
+      .then((metadata: GalleryMetadata) => {
+        const next = Object.entries(metadata.references).map(([key, images]) => {
+          const separator = key.indexOf("::");
+          const domain = key.slice(0, separator) as StoneDomain;
+          const className = key.slice(separator + 2);
+          return {
+            className,
+            domain,
+            image: images[0].replace("/model/references/", "/atlas-thumbs/"),
+          };
+        });
+        setItems(next);
+      })
+      .catch(() => setItems([]));
+  }, []);
+
+  const visibleItems = useMemo(
+    () => activeDomain ? items.filter((item) => item.domain === activeDomain) : [],
+    [activeDomain, items],
+  );
+  const activeCategory = categories.find((category) => category.domain === activeDomain);
+
+  /* 优化：详情底部也可一键收起，并平滑回到图鉴标题。 */
+  const collapseAtlas = () => {
+    setActiveDomain(null);
+    window.setTimeout(() => document.getElementById("atlas")?.scrollIntoView({ behavior: "smooth", block: "start" }), 0);
+  };
+
+  return (
+    <section className="atlas-section" id="atlas">
+      <div className="atlas-heading">
+        <div>
+          <span className="eyebrow">STONE ATLAS</span>
+          <h2>石种图鉴</h2>
+        </div>
+        {/* 优化 */}
+        <p>覆盖 87 种宝石、10 种玉石原石和 9 种岩石；AI 快速识别，上传图片即可识别。</p>
+      </div>
+
+      <div className="atlas-category-grid">
+        {categories.map((category) => (
+          <button
+            className={`atlas-category-card ${activeDomain === category.domain ? "active" : ""}`}
+            key={category.domain}
+            onClick={() => setActiveDomain((current) => current === category.domain ? null : category.domain)}
+            aria-expanded={activeDomain === category.domain}
+          >
+            <span>{category.english}</span>
+            <b><strong>{category.count}</strong> 种 {category.name}</b>
+            <small>{category.description}</small>
+            <i>{activeDomain === category.domain ? "收起详情 −" : "展开图鉴 +"}</i>
+          </button>
+        ))}
+      </div>
+
+      {activeDomain && (
+        <div className="atlas-details">
+          <div className="atlas-details-head">
+            <div><span>{activeCategory?.english}</span><h3>{activeCategory?.name}</h3></div>
+            <b>{visibleItems.length} 个类别</b>
+          </div>
+          <div className="atlas-stone-grid">
+            {visibleItems.map((item) => (
+              <article key={`${item.domain}-${item.className}`}>
+                <img src={item.image} alt={`${chineseNameForStone(item.className)} ${item.className}`} loading="lazy" decoding="async" />
+                <div><b>{chineseNameForStone(item.className)}</b><small>{item.className}</small></div>
+              </article>
+            ))}
+          </div>
+          {/* 优化 */}
+          <button className="atlas-collapse-button" onClick={collapseAtlas}>收起详情 ↑</button>
+        </div>
+      )}
+    </section>
+  );
+}

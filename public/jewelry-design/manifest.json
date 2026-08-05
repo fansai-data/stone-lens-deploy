@@ -1,0 +1,350 @@
+[
+  {
+    "className": "Alexandrite",
+    "image": "/jewelry-design/Alexandrite.webp"
+  },
+  {
+    "className": "Almandine",
+    "image": "/jewelry-design/Almandine.webp"
+  },
+  {
+    "className": "Amazonite",
+    "image": "/jewelry-design/Amazonite.webp"
+  },
+  {
+    "className": "Amber",
+    "image": "/jewelry-design/Amber.webp"
+  },
+  {
+    "className": "Amethyst",
+    "image": "/jewelry-design/Amethyst.webp"
+  },
+  {
+    "className": "Ametrine",
+    "image": "/jewelry-design/Ametrine.webp"
+  },
+  {
+    "className": "Andalusite",
+    "image": "/jewelry-design/Andalusite.webp"
+  },
+  {
+    "className": "Andradite",
+    "image": "/jewelry-design/Andradite.webp"
+  },
+  {
+    "className": "Aquamarine",
+    "image": "/jewelry-design/Aquamarine.webp"
+  },
+  {
+    "className": "Aventurine Green",
+    "image": "/jewelry-design/Aventurine-Green.webp"
+  },
+  {
+    "className": "Aventurine Yellow",
+    "image": "/jewelry-design/Aventurine-Yellow.webp"
+  },
+  {
+    "className": "Benitoite",
+    "image": "/jewelry-design/Benitoite.webp"
+  },
+  {
+    "className": "Beryl Golden",
+    "image": "/jewelry-design/Beryl-Golden.webp"
+  },
+  {
+    "className": "Bixbite",
+    "image": "/jewelry-design/Bixbite.webp"
+  },
+  {
+    "className": "Bloodstone",
+    "image": "/jewelry-design/Bloodstone.webp"
+  },
+  {
+    "className": "Blue Lace Agate",
+    "image": "/jewelry-design/Blue-Lace-Agate.webp"
+  },
+  {
+    "className": "Carnelian",
+    "image": "/jewelry-design/Carnelian.webp"
+  },
+  {
+    "className": "Cats Eye",
+    "image": "/jewelry-design/Cats-Eye.webp"
+  },
+  {
+    "className": "Chalcedony",
+    "image": "/jewelry-design/Chalcedony.webp"
+  },
+  {
+    "className": "Chalcedony Blue",
+    "image": "/jewelry-design/Chalcedony-Blue.webp"
+  },
+  {
+    "className": "Chrome Diopside",
+    "image": "/jewelry-design/Chrome-Diopside.webp"
+  },
+  {
+    "className": "Chrysoberyl",
+    "image": "/jewelry-design/Chrysoberyl.webp"
+  },
+  {
+    "className": "Chrysocolla",
+    "image": "/jewelry-design/Chrysocolla.webp"
+  },
+  {
+    "className": "Chrysoprase",
+    "image": "/jewelry-design/Chrysoprase.webp"
+  },
+  {
+    "className": "Citrine",
+    "image": "/jewelry-design/Citrine.webp"
+  },
+  {
+    "className": "Coral",
+    "image": "/jewelry-design/Coral.webp"
+  },
+  {
+    "className": "Danburite",
+    "image": "/jewelry-design/Danburite.webp"
+  },
+  {
+    "className": "Diamond",
+    "image": "/jewelry-design/Diamond.webp"
+  },
+  {
+    "className": "Diaspore",
+    "image": "/jewelry-design/Diaspore.webp"
+  },
+  {
+    "className": "Dumortierite",
+    "image": "/jewelry-design/Dumortierite.webp"
+  },
+  {
+    "className": "Emerald",
+    "image": "/jewelry-design/Emerald.webp"
+  },
+  {
+    "className": "Fluorite",
+    "image": "/jewelry-design/Fluorite.webp"
+  },
+  {
+    "className": "Garnet Red",
+    "image": "/jewelry-design/Garnet-Red.webp"
+  },
+  {
+    "className": "Goshenite",
+    "image": "/jewelry-design/Goshenite.webp"
+  },
+  {
+    "className": "Grossular",
+    "image": "/jewelry-design/Grossular.webp"
+  },
+  {
+    "className": "Hessonite",
+    "image": "/jewelry-design/Hessonite.webp"
+  },
+  {
+    "className": "Hiddenite",
+    "image": "/jewelry-design/Hiddenite.webp"
+  },
+  {
+    "className": "Iolite",
+    "image": "/jewelry-design/Iolite.webp"
+  },
+  {
+    "className": "Jade",
+    "image": "/jewelry-design/Jade.webp"
+  },
+  {
+    "className": "Jasper",
+    "image": "/jewelry-design/Jasper.webp"
+  },
+  {
+    "className": "Kunzite",
+    "image": "/jewelry-design/Kunzite.webp"
+  },
+  {
+    "className": "Kyanite",
+    "image": "/jewelry-design/Kyanite.webp"
+  },
+  {
+    "className": "Labradorite",
+    "image": "/jewelry-design/Labradorite.webp"
+  },
+  {
+    "className": "Lapis Lazuli",
+    "image": "/jewelry-design/Lapis-Lazuli.webp"
+  },
+  {
+    "className": "Larimar",
+    "image": "/jewelry-design/Larimar.webp"
+  },
+  {
+    "className": "Malachite",
+    "image": "/jewelry-design/Malachite.webp"
+  },
+  {
+    "className": "Moonstone",
+    "image": "/jewelry-design/Moonstone.webp"
+  },
+  {
+    "className": "Morganite",
+    "image": "/jewelry-design/Morganite.webp"
+  },
+  {
+    "className": "Onyx Black",
+    "image": "/jewelry-design/Onyx-Black.webp"
+  },
+  {
+    "className": "Onyx Green",
+    "image": "/jewelry-design/Onyx-Green.webp"
+  },
+  {
+    "className": "Onyx Red",
+    "image": "/jewelry-design/Onyx-Red.webp"
+  },
+  {
+    "className": "Opal",
+    "image": "/jewelry-design/Opal.webp"
+  },
+  {
+    "className": "Pearl",
+    "image": "/jewelry-design/Pearl.webp"
+  },
+  {
+    "className": "Peridot",
+    "image": "/jewelry-design/Peridot.webp"
+  },
+  {
+    "className": "Prehnite",
+    "image": "/jewelry-design/Prehnite.webp"
+  },
+  {
+    "className": "Pyrite",
+    "image": "/jewelry-design/Pyrite.webp"
+  },
+  {
+    "className": "Pyrope",
+    "image": "/jewelry-design/Pyrope.webp"
+  },
+  {
+    "className": "Quartz Beer",
+    "image": "/jewelry-design/Quartz-Beer.webp"
+  },
+  {
+    "className": "Quartz Lemon",
+    "image": "/jewelry-design/Quartz-Lemon.webp"
+  },
+  {
+    "className": "Quartz Rose",
+    "image": "/jewelry-design/Quartz-Rose.webp"
+  },
+  {
+    "className": "Quartz Rutilated",
+    "image": "/jewelry-design/Quartz-Rutilated.webp"
+  },
+  {
+    "className": "Quartz Smoky",
+    "image": "/jewelry-design/Quartz-Smoky.webp"
+  },
+  {
+    "className": "Rhodochrosite",
+    "image": "/jewelry-design/Rhodochrosite.webp"
+  },
+  {
+    "className": "Rhodolite",
+    "image": "/jewelry-design/Rhodolite.webp"
+  },
+  {
+    "className": "Rhodonite",
+    "image": "/jewelry-design/Rhodonite.webp"
+  },
+  {
+    "className": "Ruby",
+    "image": "/jewelry-design/Ruby.webp"
+  },
+  {
+    "className": "Sapphire Blue",
+    "image": "/jewelry-design/Sapphire-Blue.webp"
+  },
+  {
+    "className": "Sapphire Pink",
+    "image": "/jewelry-design/Sapphire-Pink.webp"
+  },
+  {
+    "className": "Sapphire Purple",
+    "image": "/jewelry-design/Sapphire-Purple.webp"
+  },
+  {
+    "className": "Sapphire Yellow",
+    "image": "/jewelry-design/Sapphire-Yellow.webp"
+  },
+  {
+    "className": "Scapolite",
+    "image": "/jewelry-design/Scapolite.webp"
+  },
+  {
+    "className": "Serpentine",
+    "image": "/jewelry-design/Serpentine.webp"
+  },
+  {
+    "className": "Sodalite",
+    "image": "/jewelry-design/Sodalite.webp"
+  },
+  {
+    "className": "Spessartite",
+    "image": "/jewelry-design/Spessartite.webp"
+  },
+  {
+    "className": "Sphene",
+    "image": "/jewelry-design/Sphene.webp"
+  },
+  {
+    "className": "Spinel",
+    "image": "/jewelry-design/Spinel.webp"
+  },
+  {
+    "className": "Spodumene",
+    "image": "/jewelry-design/Spodumene.webp"
+  },
+  {
+    "className": "Sunstone",
+    "image": "/jewelry-design/Sunstone.webp"
+  },
+  {
+    "className": "Tanzanite",
+    "image": "/jewelry-design/Tanzanite.webp"
+  },
+  {
+    "className": "Tigers Eye",
+    "image": "/jewelry-design/Tigers-Eye.webp"
+  },
+  {
+    "className": "Topaz",
+    "image": "/jewelry-design/Topaz.webp"
+  },
+  {
+    "className": "Tourmaline",
+    "image": "/jewelry-design/Tourmaline.webp"
+  },
+  {
+    "className": "Tsavorite",
+    "image": "/jewelry-design/Tsavorite.webp"
+  },
+  {
+    "className": "Turquoise",
+    "image": "/jewelry-design/Turquoise.webp"
+  },
+  {
+    "className": "Variscite",
+    "image": "/jewelry-design/Variscite.webp"
+  },
+  {
+    "className": "Zircon",
+    "image": "/jewelry-design/Zircon.webp"
+  },
+  {
+    "className": "Zoisite",
+    "image": "/jewelry-design/Zoisite.webp"
+  }
+]

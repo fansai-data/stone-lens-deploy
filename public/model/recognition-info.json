@@ -1,0 +1,19 @@
+{
+  "checkpoint_classes": 87,
+  "device": "cuda",
+  "gallery_count": 5521,
+  "embedding_dimension": 1280,
+  "reference_classes": 106,
+  "export": {
+    "onnx_bytes": 8868540,
+    "max_abs_error": 1.7881393432617188e-07,
+    "cosine_similarity": 0.9999998807907104,
+    "output_norm": 0.9999998211860657
+  },
+  "quantization": {
+    "query_count": 48,
+    "top1_agreement": 0.9375,
+    "mean_top5_overlap": 0.9916666666666667,
+    "max_score_error": 0.0008324384689331055
+  }
+}
