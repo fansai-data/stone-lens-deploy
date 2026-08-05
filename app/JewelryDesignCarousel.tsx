@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { chineseNameForStone } from "./stoneKnowledge";
+import { sitePath } from "./sitePath";
 
 type JewelryItem = { className: string; image: string };
 
@@ -13,9 +14,9 @@ export default function JewelryDesignCarousel({ gemNames }: { gemNames: string[]
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    fetch("/jewelry-design/manifest.json")
+    fetch(sitePath("/jewelry-design/manifest.json"))
       .then((response) => response.json())
-      .then((next: JewelryItem[]) => setItems(next))
+      .then((next: JewelryItem[]) => setItems(next.map((item) => ({ ...item, image: sitePath(item.image) }))))
       .catch(() => setItems([]))
       .finally(() => setLoaded(true));
   }, []);

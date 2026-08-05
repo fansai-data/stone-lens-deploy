@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { sitePath } from "./sitePath";
 
 type PaymentState = "idle" | "verifying" | "success";
 
@@ -33,7 +34,7 @@ export default function MembershipView({
     <div className="membership-view" role="dialog" aria-modal="true" aria-label="StoneLens 会员中心">
       <header className="membership-header">
         {/* 优化 */}
-        <div className="brand"><img className="brand-logo" src="/images/diamond-logo.png" alt="石相 StoneLens Logo" /><span><b>石相会员</b><small>StoneLens Membership</small></span></div>
+        <div className="brand"><img className="brand-logo" src={sitePath("/images/diamond-logo.png")} alt="石相 StoneLens Logo" /><span><b>石相会员</b><small>StoneLens Membership</small></span></div>
         <button className="secondary-button" onClick={onClose}>返回识别</button>
       </header>
       <main className="membership-main">
@@ -56,8 +57,8 @@ export default function MembershipView({
           <div><span className="eyebrow">DEMO PAYMENT</span><h2>开通会员</h2><p>选择支付宝或微信二维码，完成演示后点击下方按钮。</p></div>
           <div className="payment-codes">
             {/* 优化 */}
-            <div><img src="/images/payment/zfbpay.jpg" alt="支付宝会员支付二维码" /><b>支付宝</b></div>
-            <div><img src="/images/payment/WeChatpay.jpg" alt="微信会员支付二维码" /><b>微信支付</b></div>
+            <div><img src={sitePath("/images/payment/zfbpay.jpg")} alt="支付宝会员支付二维码" /><b>支付宝</b></div>
+            <div><img src={sitePath("/images/payment/WeChatpay.jpg")} alt="微信会员支付二维码" /><b>微信支付</b></div>
           </div>
           <div className={`payment-status ${paymentState}`} aria-live="polite">
             {paymentState === "verifying" && <><span className="button-spinner" />正在验证支付...</>}

@@ -21,6 +21,7 @@ import StoneAtlas from "./StoneAtlas";
 import BirthstoneStories from "./BirthstoneStories";
 import JewelryDesignCarousel from "./JewelryDesignCarousel";
 import PwaInstallPrompt from "./PwaInstallPrompt";
+import { sitePath } from "./sitePath";
 import {
   bilingualCountryName,
   crystalSystemForStone,
@@ -49,16 +50,16 @@ type HistoryEntry = { id: string; time: string; chineseName: string; englishName
 
 /* 优化 */
 const heroSlides = [
-  { image: "/showcase/hero-emerald-hd.webp", name: "祖母绿", english: "Emerald", type: "彩色宝石" },
-  { image: "/showcase/hero-ruby-hd.webp", name: "红宝石", english: "Ruby", type: "彩色宝石" },
-  { image: "/showcase/hero-sapphire-hd.webp", name: "蓝宝石", english: "Blue Sapphire", type: "彩色宝石" },
-  { image: "/showcase/hero-jadeite-raw-hd.webp", name: "翡翠原石", english: "Jadeite Raw", type: "玉石原石" },
-  { image: "/showcase/hero-basalt-hd.webp", name: "玄武岩", english: "Basalt", type: "常见岩石" },
+  { image: sitePath("/showcase/hero-emerald-hd.webp"), name: "祖母绿", english: "Emerald", type: "彩色宝石" },
+  { image: sitePath("/showcase/hero-ruby-hd.webp"), name: "红宝石", english: "Ruby", type: "彩色宝石" },
+  { image: sitePath("/showcase/hero-sapphire-hd.webp"), name: "蓝宝石", english: "Blue Sapphire", type: "彩色宝石" },
+  { image: sitePath("/showcase/hero-jadeite-raw-hd.webp"), name: "翡翠原石", english: "Jadeite Raw", type: "玉石原石" },
+  { image: sitePath("/showcase/hero-basalt-hd.webp"), name: "玄武岩", english: "Basalt", type: "常见岩石" },
 ];
 
 /* 优化 */
-const AMETRINE_QUERY_IMAGE = "/model/references/demo-user-ametrine-7.jpg";
-const AMETRINE_REFERENCE_IMAGE = "/model/references/gemstone--Ametrine--1.webp";
+const AMETRINE_QUERY_IMAGE = sitePath("/model/references/demo-user-ametrine-7.jpg");
+const AMETRINE_REFERENCE_IMAGE = sitePath("/model/references/gemstone--Ametrine--1.webp");
 const AMETRINE_DEMO: StoneRecognitionResult = {
   best: { className: "Ametrine", domain: "gemstone", score: 0.987, image: AMETRINE_REFERENCE_IMAGE },
   matches: [
@@ -208,7 +209,7 @@ export default function Home() {
 
   useEffect(() => {
     if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("/sw.js").catch(() => undefined);
+      navigator.serviceWorker.register(sitePath("/sw.js")).catch(() => undefined);
     }
     return () => {
       if (queryImage?.startsWith("blob:")) URL.revokeObjectURL(queryImage);
@@ -445,7 +446,7 @@ export default function Home() {
       <header className="topbar">
         <a className="brand" href="#top" aria-label="石相首页">
           {/* 优化 */}
-          <img className="brand-logo" src="/images/diamond-logo.png" alt="石相 StoneLens Logo" />
+          <img className="brand-logo" src={sitePath("/images/diamond-logo.png")} alt="石相 StoneLens Logo" />
           <span>
             <b>石相</b>
             <small>StoneLens</small>
@@ -757,7 +758,7 @@ export default function Home() {
       <footer>
         <div className="brand footer-brand">
           {/* 优化 */}
-          <img className="brand-logo" src="/images/diamond-logo.png" alt="石相 StoneLens Logo" />
+          <img className="brand-logo" src={sitePath("/images/diamond-logo.png")} alt="石相 StoneLens Logo" />
           <span><b>石相 StoneLens</b><small>视觉相似检索实验室</small></span>
         </div>
         <p>

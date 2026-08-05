@@ -34,3 +34,16 @@ npm run dev
 - `public/ort/`
 
 完整训练数据、原始 PyTorch 模型和后端离线工具保存在 `stone_web_demo` 源码仓库中。
+# StoneLens static GitHub Pages demo
+
+This `github-pages` branch is the long-lived static demonstration edition. It keeps browser-side visual matching, 3D models, atlas, maps and local history. AI Q&A is intentionally disabled here because GitHub Pages has no secure server environment for `DEEPSEEK_API_KEY`.
+
+## Publish once
+
+1. Open the repository **Settings → Pages**.
+2. Under **Build and deployment**, choose **GitHub Actions** as the source.
+3. The included workflow deploys each push to `github-pages`.
+
+Expected address: `https://justice060407.github.io/stone-lens-deploy/`
+
+For the judge presentation that needs AI Q&A, use a newly generated EdgeOne three-hour preview link instead.

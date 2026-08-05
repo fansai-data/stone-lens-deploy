@@ -1,3 +1,5 @@
+import { sitePath } from "./sitePath";
+
 export type StoneDomain = "gemstone" | "jade_raw" | "common_rock";
 
 export type StoneMatch = {
@@ -57,25 +59,25 @@ async function loadAssets(): Promise<RecognitionAssets> {
     assetsPromise = (async () => {
       // This ESM bundle is served locally with the site so recognition also
       // works without a third-party CDN at inference time.
-      const runtimePath = "/ort/ort.wasm.bundle.min.mjs";
+      const runtimePath = sitePath("/ort/ort.wasm.bundle.min.mjs");
       const runtimeImport = new Function(
         "path",
         "return import(path)",
       ) as (path: string) => Promise<OrtModule>;
       const ort = await runtimeImport(runtimePath);
-      ort.env.wasm.wasmPaths = "/ort/";
+      ort.env.wasm.wasmPaths = sitePath("/ort/");
       ort.env.wasm.numThreads = globalThis.crossOriginIsolated
         ? Math.min(4, navigator.hardwareConcurrency || 1)
         : 1;
 
       const [session, metadataResponse, vectorResponse, scaleResponse] = await Promise.all([
-        ort.InferenceSession.create("/model/stonelens-mobilenetv2-features.onnx", {
+        ort.InferenceSession.create(sitePath("/model/stonelens-mobilenetv2-features.onnx"), {
           executionProviders: ["wasm"],
           graphOptimizationLevel: "all",
         }),
-        fetch("/model/gallery-metadata.json"),
-        fetch("/model/gallery-u8.bin"),
-        fetch("/model/gallery-scales-f32.bin"),
+        fetch(sitePath("/model/gallery-metadata.json")),
+        fetch(sitePath("/model/gallery-u8.bin")),
+        fetch(sitePath("/model/gallery-scales-f32.bin")),
       ]);
       if (!metadataResponse.ok || !vectorResponse.ok || !scaleResponse.ok) {
         throw new Error("识别资源下载失败，请检查网络后重试。");
@@ -133,13 +135,13 @@ async function preprocess(url: string): Promise<Float32Array> {
 
 function nextReference(key: string, references: string[]) {
   if (references.length <= 1) {
-    return { image: references[0] || "", number: references.length ? 1 : 0 };
+    return { image: sitePath(references[0] || ""), number: references.length ? 1 : 0 };
   }
   const storageKey = `stonelens-reference-${key}`;
   const previous = Number.parseInt(localStorage.getItem(storageKey) || "-1", 10);
   const index = (Number.isFinite(previous) ? previous + 1 : 0) % references.length;
   localStorage.setItem(storageKey, String(index));
-  return { image: references[index], number: index + 1 };
+  return { image: sitePath(references[index]), number: index + 1 };
 }
 
 function searchGallery(
@@ -176,7 +178,7 @@ function searchGallery(
         className,
         domain,
         score,
-        image: metadata.references[key]?.[0] || "",
+        image: sitePath(metadata.references[key]?.[0] || ""),
       };
     });
   if (!matches.length) throw new Error("图库中没有可用的匹配结果。");

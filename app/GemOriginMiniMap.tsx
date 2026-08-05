@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import type { StoneDomain } from "./stoneRecognition";
 import { bilingualCountryName, countriesForStone } from "./stoneKnowledge";
+import { sitePath } from "./sitePath";
 
 type Chart = { setOption(option: unknown, options?: unknown): void; resize(): void; clear(): void; dispose(): void };
 type ECharts = { init(element: HTMLElement, theme?: unknown, options?: unknown): Chart; registerMap(name: string, geo: unknown): void };
@@ -85,7 +86,7 @@ export default function GemOriginMiniMap({ domain, className }: { domain: StoneD
 
     Promise.all([
       ensureECharts(),
-      fetch("/maps/world.geojson").then((response) => response.json()),
+      fetch(sitePath("/maps/world.geojson")).then((response) => response.json()),
     ]).then(([echarts, geoJson]) => {
       if (!active || !root.current) return;
       echarts.registerMap("stonelens-gem-origin", geoJson);

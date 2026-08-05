@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { chineseNameForStone } from "./stoneKnowledge";
 import type { StoneDomain } from "./stoneRecognition";
+import { sitePath } from "./sitePath";
 
 type GalleryMetadata = {
   references: Record<string, string[]>;
@@ -31,7 +32,7 @@ export default function StoneAtlas() {
   const [activeDomain, setActiveDomain] = useState<StoneDomain | null>(null);
 
   useEffect(() => {
-    fetch("/model/gallery-metadata.json")
+    fetch(sitePath("/model/gallery-metadata.json"))
       .then((response) => response.json())
       .then((metadata: GalleryMetadata) => {
         const next = Object.entries(metadata.references).map(([key, images]) => {
@@ -41,7 +42,7 @@ export default function StoneAtlas() {
           return {
             className,
             domain,
-            image: images[0].replace("/model/references/", "/atlas-thumbs/"),
+            image: images[0].replace("/model/references/", sitePath("/atlas-thumbs/")),
           };
         });
         setItems(next);

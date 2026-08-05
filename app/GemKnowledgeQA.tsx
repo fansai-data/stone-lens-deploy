@@ -2,6 +2,7 @@
 
 import { FormEvent, useRef, useState } from "react";
 import { chineseNameForStone } from "./stoneKnowledge";
+import { isStaticDemo, sitePath } from "./sitePath";
 
 /* 优化 */
 export default function GemKnowledgeQA({
@@ -22,7 +23,7 @@ export default function GemKnowledgeQA({
   const ask = async (event: FormEvent) => {
     event.preventDefault();
     setError(null);
-    if (!isMember) return;
+    if (!isMember || isStaticDemo) return;
     if (!currentGemName) {
       setError("请先完成一次石头识别，再向 AI 提问。");
       return;
@@ -41,7 +42,7 @@ export default function GemKnowledgeQA({
     requestTimes.current.push(now);
     setLoading(true);
     try {
-      const response = await fetch("/api/gem-chat", {
+      const response = await fetch(sitePath("/api/gem-chat"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ gemName: currentGemName, question: trimmed }),
@@ -57,13 +58,15 @@ export default function GemKnowledgeQA({
   };
 
   return (
-    <section className={`gem-qa ${isMember ? "" : "is-locked"}`} aria-label="AI 宝石知识问答">
+    <section className={`gem-qa ${isMember && !isStaticDemo ? "" : "is-locked"}`} aria-label="AI 宝石知识问答">
       <div className="gem-qa-intro">
         <div><span className="eyebrow">AI GEMOLOGY ASSISTANT</span><h3>继续了解 {currentGemName ? `${chineseNameForStone(currentGemName)} · ${currentGemName}` : "识别结果"}</h3></div>
         {/* 优化：保留模型与限流说明，不向用户展示内部回答长度约束。 */}
         <small>DeepSeek V4 Flash · 每分钟最多 3 次</small>
       </div>
-      {!isMember && (
+      {isStaticDemo ? (
+        <div className="gem-qa-member-notice"><div><b>静态展示版不含在线 AI 问答</b><span>图像匹配可在浏览器本地运行；评委演示请使用 EdgeOne 完整版链接。</span></div></div>
+      ) : !isMember && (
         <div className="gem-qa-member-notice">
           <div><b>该功能为会员专属</b><span>开通会员后可使用 AI 宝石知识问答</span></div>
           <button className="secondary-button" onClick={onOpenMembership}>查看会员权益</button>
@@ -76,9 +79,9 @@ export default function GemKnowledgeQA({
           onChange={(event) => setQuestion(event.target.value)}
           placeholder="例如：这种宝石日常佩戴时需要注意什么？"
           aria-label="向 AI 提问"
-          disabled={!isMember}
+          disabled={!isMember || isStaticDemo}
         />
-        <button className="primary-button" disabled={!isMember || loading}>
+        <button className="primary-button" disabled={!isMember || isStaticDemo || loading}>
           {loading ? "正在回答…" : "询问 AI"}
         </button>
       </form>

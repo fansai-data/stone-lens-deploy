@@ -1,7 +1,8 @@
 /* 优化 */
 const CACHE = "stonelens-shell-v5";
 /* 优化：仅缓存轻量页面外壳，避免把大型模型和图库一次性塞进手机缓存。 */
-const SHELL = ["/", "/manifest.webmanifest", "/icon-192.png", "/icon-512.png", "/apple-touch-icon.png"];
+/* 优化：相对路径让 Service Worker 在 GitHub Pages 项目子路径内正常工作。 */
+const SHELL = ["./", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png", "./apple-touch-icon.png"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(SHELL)));
