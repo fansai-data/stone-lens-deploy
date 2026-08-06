@@ -3572,9 +3572,7 @@ main {
   overflow: hidden;
   color: #fff;
   text-align: left;
-  background:
-    radial-gradient(circle at 78% 22%, rgba(206, 166, 255, .6), transparent 24%),
-    linear-gradient(145deg, #715198, #30213d 74%);
+  background: #332141;
   border: 0;
   border-radius: 23px;
   box-shadow: 0 22px 55px rgba(43, 29, 58, .14);
@@ -3582,8 +3580,13 @@ main {
   transition: transform 220ms ease, box-shadow 220ms ease;
 }
 
-.atlas-category-card:nth-child(2) { background: radial-gradient(circle at 78% 22%, rgba(166, 238, 215, .55), transparent 24%), linear-gradient(145deg, #4b8a78, #243b35 74%); }
-.atlas-category-card:nth-child(3) { background: radial-gradient(circle at 78% 22%, rgba(222, 194, 152, .52), transparent 24%), linear-gradient(145deg, #76634e, #322c27 74%); }
+/* 优化：分类封面加柔和渐变掩盖，兼顾照片质感和文字对比度。 */
+.atlas-category-cover { position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; transform: scale(1.03); transition: transform 500ms ease; }
+.atlas-category-card::after { content: ""; position: absolute; inset: 0; z-index: 1; background: linear-gradient(140deg, rgba(22, 13, 30, .89) 0%, rgba(31, 19, 42, .60) 43%, rgba(18, 10, 26, .20) 100%), linear-gradient(0deg, rgba(17, 10, 25, .65) 0%, transparent 54%); }
+.atlas-category-card:nth-child(2)::after { background: linear-gradient(140deg, rgba(15, 44, 35, .88) 0%, rgba(25, 74, 57, .55) 45%, rgba(9, 28, 22, .18) 100%), linear-gradient(0deg, rgba(11, 37, 27, .62) 0%, transparent 54%); }
+.atlas-category-card:nth-child(3)::after { background: linear-gradient(140deg, rgba(42, 36, 29, .90) 0%, rgba(82, 65, 47, .54) 45%, rgba(30, 25, 21, .20) 100%), linear-gradient(0deg, rgba(34, 28, 23, .65) 0%, transparent 54%); }
+.atlas-category-card > span, .atlas-category-card > b, .atlas-category-card > small, .atlas-category-card > i { position: relative; z-index: 2; }
+.atlas-category-card:hover .atlas-category-cover, .atlas-category-card.active .atlas-category-cover { transform: scale(1.09); }
 .atlas-category-card:hover,
 .atlas-category-card.active { transform: translateY(-4px); box-shadow: 0 28px 65px rgba(43, 29, 58, .22); }
 .atlas-category-card > span { color: rgba(255,255,255,.62); font-size: 10px; font-weight: 800; letter-spacing: .18em; }

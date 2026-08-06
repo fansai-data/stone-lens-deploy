@@ -481,7 +481,8 @@ export default function Home() {
               ? `${currentUser.username} · ${currentUser.role === "admin" ? "管理员" : "用户"}${isMember ? " · 👑 会员" : ""}`
               : "登录 / 注册"}
           </button>
-          <button className="account-button" onClick={openMembership}>开通会员</button>
+          {/* 优化：会员开通后不再重复显示购买入口。 */}
+          {!isMember && <button className="account-button" onClick={openMembership}>开通会员</button>}
         </div>
       </header>
 

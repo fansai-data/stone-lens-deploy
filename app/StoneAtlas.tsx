@@ -21,10 +21,12 @@ const categories: Array<{
   name: string;
   english: string;
   description: string;
+  cover: string;
 }> = [
-  { domain: "gemstone", count: 87, name: "彩色宝石", english: "COLORED GEMSTONES", description: "从钻石、红蓝宝石到小众彩宝" },
-  { domain: "jade_raw", count: 10, name: "玉石原石", english: "RAW JADE", description: "保留皮壳、纹理与天然形态" },
-  { domain: "common_rock", count: 9, name: "普通岩石", english: "COMMON ROCKS", description: "帮助排除外观相近的普通石头" },
+  /* 优化：三个主分类各自使用用户提供的视觉封面。 */
+  { domain: "gemstone", count: 87, name: "彩色宝石", english: "COLORED GEMSTONES", description: "从钻石、红蓝宝石到小众彩宝", cover: sitePath("/atlas-covers/gemstones-cover.webp") },
+  { domain: "jade_raw", count: 10, name: "玉石原石", english: "RAW JADE", description: "保留皮壳、纹理与天然形态", cover: sitePath("/atlas-covers/jade-raw-cover.webp") },
+  { domain: "common_rock", count: 9, name: "普通岩石", english: "COMMON ROCKS", description: "帮助排除外观相近的普通石头", cover: sitePath("/atlas-covers/common-rock-cover.webp") },
 ];
 
 export default function StoneAtlas() {
@@ -81,6 +83,8 @@ export default function StoneAtlas() {
             onClick={() => setActiveDomain((current) => current === category.domain ? null : category.domain)}
             aria-expanded={activeDomain === category.domain}
           >
+            {/* 优化：封面图位于文字下方，CSS 渐变遮罩保证信息可读。 */}
+            <img className="atlas-category-cover" src={category.cover} alt="" aria-hidden="true" />
             <span>{category.english}</span>
             <b><strong>{category.count}</strong> 种 {category.name}</b>
             <small>{category.description}</small>
