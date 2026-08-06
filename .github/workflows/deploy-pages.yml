@@ -23,8 +23,7 @@ jobs:
       NEXT_PUBLIC_BASE_PATH: /stone-lens-deploy
       NEXT_PUBLIC_STATIC_DEMO: "true"
       NEXT_PUBLIC_SITE_URL: https://justice060407.github.io/stone-lens-deploy
-      # /* 优化 */ GitHub Pages 复用完整版的服务器端 AI 接口，不在静态代码中保存密钥。
-      NEXT_PUBLIC_GEM_CHAT_API: https://stone-web-demo.1935489974.workers.dev/api/gem-chat
+      # /* 优化 */ 腾讯云部署使用同站点 /api/gem-chat；静态仓库不再依赖 workers.dev。
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
