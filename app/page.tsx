@@ -76,6 +76,17 @@ const AMETRINE_DEMO: StoneRecognitionResult = {
 };
 
 /* 优化：比赛静态版在浏览器内保存不可逆密码摘要，不保存明文密码。 */
+/* 优化 */
+function safeImagePath(path: string) {
+  if (!path) return "";
+  if (/^(https?:|blob:|data:)/.test(path)) return path;
+  if (path.startsWith("/stone-lens-deploy/")) return path;
+  if (/^(gemstone|jade_raw|common_rock)--.+\.(webp|jpe?g|png)$/i.test(path)) {
+    return sitePath(`/model/references/${path}`);
+  }
+  return sitePath(path.startsWith("/") ? path : `/${path}`);
+}
+
 async function hashLocalPassword(password: string) {
   const bytes = new TextEncoder().encode(password);
   const digest = await window.crypto.subtle.digest("SHA-256", bytes);
@@ -588,7 +599,7 @@ export default function Home() {
                     ) : (
                       <img
                         key={recognition.referenceImage}
-                        src={recognition.referenceImage}
+                        src={safeImagePath(recognition.referenceImage)}
                         alt={`${recognition.best.className} 类别参考图`}
                         loading="eager"
                         decoding="sync"
@@ -740,7 +751,7 @@ export default function Home() {
               <div className="match-grid">
                 {recognition.matches.map((match, index) => (
                   <div className="match-card" key={`${match.domain}-${match.className}`}>
-                    <img src={match.image} alt={`${match.className} 参考样本`} />
+                    <img src={safeImagePath(match.image)} alt={`${match.className} 参考样本`} />
                     <span>#{index + 1}</span>
                     <div><b>{chineseNameForStone(match.className)}</b><small>{match.className} · {match.score.toFixed(3)}</small></div>
                   </div>
