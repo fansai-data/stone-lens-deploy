@@ -22,6 +22,7 @@ import BirthstoneStories from "./BirthstoneStories";
 import JewelryDesignCarousel from "./JewelryDesignCarousel";
 import PwaInstallPrompt from "./PwaInstallPrompt";
 import { sitePath } from "./sitePath";
+import ImageCropper from "./ImageCropper";
 import {
   bilingualCountryName,
   crystalSystemForStone,
@@ -138,6 +139,9 @@ function profileFor(match: StoneMatch) {
 export default function Home() {
   const [stage, setStage] = useState<Stage>("idle");
   const [queryImage, setQueryImage] = useState<string | null>(null);
+  /* 优化：保留上传原图，允许识别前随时重新框选。 */
+  const [originalQueryImage, setOriginalQueryImage] = useState<string | null>(null);
+  const [cropOpen, setCropOpen] = useState(false);
   const [querySource, setQuerySource] = useState<QuerySource>(null);
   const [freeScans, setFreeScans] = useState(10);
   const [quotaReady, setQuotaReady] = useState(false);
@@ -237,6 +241,8 @@ export default function Home() {
     if (queryImage?.startsWith("blob:")) URL.revokeObjectURL(queryImage);
     /* 优化 */
     setQueryImage(AMETRINE_QUERY_IMAGE);
+    setOriginalQueryImage(null);
+    setCropOpen(false);
     setQuerySource("demo");
     setRecognition(AMETRINE_DEMO);
     setRecognitionError(null);
@@ -338,12 +344,20 @@ export default function Home() {
     }
     const file = event.target.files?.[0];
     if (!file) return;
-    if (queryImage?.startsWith("blob:")) URL.revokeObjectURL(queryImage);
-    setQueryImage(URL.createObjectURL(file));
-    setQuerySource("upload");
-    setRecognition(null);
-    setRecognitionError(null);
-    setStage("ready");
+    /* 优化：先读取原图并打开手动框选，确认后才进入可识别状态。 */
+    const reader = new FileReader();
+    reader.onload = () => {
+      const image = typeof reader.result === "string" ? reader.result : null;
+      if (!image) return;
+      setOriginalQueryImage(image);
+      setQueryImage(null);
+      setQuerySource("upload");
+      setRecognition(null);
+      setRecognitionError(null);
+      setStage("idle");
+      setCropOpen(true);
+    };
+    reader.readAsDataURL(file);
   };
 
   /* 优化：所有上传入口统一执行登录检查。 */
@@ -434,6 +448,8 @@ export default function Home() {
   const reset = () => {
     if (queryImage?.startsWith("blob:")) URL.revokeObjectURL(queryImage);
     setQueryImage(null);
+    setOriginalQueryImage(null);
+    setCropOpen(false);
     setQuerySource(null);
     setRecognition(null);
     setRecognitionError(null);
@@ -604,6 +620,10 @@ export default function Home() {
                       <small>请尽量上传背景干净、石头主体清晰的照片</small>
                     </div>
                   </button>
+                )}
+                {/* 优化：识别前可返回原图重新框选石头主体。 */}
+                {queryImage && querySource === "upload" && originalQueryImage && stage !== "analyzing" && (
+                  <button type="button" className="recrop-button" onClick={() => setCropOpen(true)}>重新框选</button>
                 )}
                 <input
                   ref={fileInput}
@@ -814,6 +834,25 @@ export default function Home() {
 
       {/* 优化 */}
       {showMembership && <MembershipView onClose={closeMembership} onPaymentSuccess={activateMembership} isMember={isMember} />}
+
+      {/* 优化：只有确认框选后，裁剪图才会进入识别与历史记录流程。 */}
+      {cropOpen && originalQueryImage && (
+        <ImageCropper
+          imageUrl={originalQueryImage}
+          onCancel={() => {
+            setCropOpen(false);
+            if (!queryImage) reset();
+          }}
+          onApply={(croppedImage) => {
+            setQueryImage(croppedImage);
+            setQuerySource("upload");
+            setRecognition(null);
+            setRecognitionError(null);
+            setStage("ready");
+            setCropOpen(false);
+          }}
+        />
+      )}
     </main>
   );
 }

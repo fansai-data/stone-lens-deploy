@@ -3951,3 +3951,32 @@ main {
   .payment-section { grid-template-columns: 1fr; }
   .payment-codes { flex-wrap: wrap; justify-content: center; }
 }
+
+/* 优化：上传后手动框选石头区域，桌面与移动端保持清晰、易触控。 */
+.query-panel.has-query { position: relative; }
+.recrop-button { position: absolute; right: 18px; bottom: 18px; z-index: 4; min-height: 40px; padding: 9px 16px; color: #fff; font: 700 14px/1 inherit; background: rgba(35,20,50,.84); border: 1px solid rgba(255,255,255,.32); border-radius: 999px; box-shadow: 0 8px 22px rgba(20,10,30,.24); backdrop-filter: blur(8px); cursor: pointer; }
+.cropper-backdrop { position: fixed; inset: 0; z-index: 250; display: grid; place-items: center; padding: 24px; background: rgba(12,8,18,.72); backdrop-filter: blur(12px); }
+.cropper-dialog { width: min(100%,1040px); max-height: calc(100dvh - 40px); overflow: auto; padding: 24px; background: #fff; border: 1px solid rgba(123,63,175,.16); border-radius: 24px; box-shadow: 0 28px 80px rgba(12,7,20,.35); }
+.cropper-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; margin-bottom: 18px; }
+.cropper-heading span { color: #7b3faf; font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+.cropper-heading h3 { margin: 5px 0; color: #211829; font-size: clamp(21px,3vw,29px); }
+.cropper-heading p { margin: 0; color: #746b79; font-size: 14px; line-height: 1.6; }
+.cropper-close { flex: 0 0 auto; width: 40px; height: 40px; color: #5f5366; font-size: 25px; background: #f5f1f7; border: 0; border-radius: 50%; cursor: pointer; }
+.cropper-canvas-shell { display: grid; place-items: center; min-height: 280px; padding: 12px; overflow: hidden; background: #17131b; border-radius: 17px; }
+.cropper-canvas-shell canvas { display: block; max-width: 100%; max-height: min(56vh,560px); width: auto; height: auto; border-radius: 8px; touch-action: none; cursor: crosshair; }
+.cropper-actions { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 18px; }
+.cropper-actions > div { display: flex; gap: 10px; }
+.cropper-actions .primary-button, .cropper-actions .secondary-button { min-width: 132px; }
+.cropper-text-button { color: #7b3faf; font-weight: 750; background: transparent; border: 0; cursor: pointer; }
+
+@media (max-width: 620px) {
+  .cropper-backdrop { align-items: end; padding: 0; }
+  .cropper-dialog { max-height: 94dvh; padding: 18px; border-radius: 22px 22px 0 0; }
+  .cropper-heading { gap: 12px; }
+  .cropper-heading p { font-size: 13px; }
+  .cropper-canvas-shell { min-height: 210px; padding: 8px; }
+  .cropper-actions { align-items: stretch; flex-direction: column; }
+  .cropper-actions > div { width: 100%; }
+  .cropper-actions .primary-button, .cropper-actions .secondary-button { flex: 1; min-width: 0; }
+  .cropper-text-button { min-height: 38px; }
+}

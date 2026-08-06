@@ -1,19 +1,19 @@
 {
-  "checkpoint_classes": 87,
+  "checkpoint_classes": 106,
   "device": "cuda",
-  "gallery_count": 5521,
+  "gallery_count": 5451,
   "embedding_dimension": 1280,
   "reference_classes": 106,
   "export": {
     "onnx_bytes": 8868540,
-    "max_abs_error": 1.7881393432617188e-07,
-    "cosine_similarity": 0.9999998807907104,
-    "output_norm": 0.9999998211860657
+    "max_abs_error": 1.30385160446167e-07,
+    "cosine_similarity": 1.0,
+    "output_norm": 1.0
   },
   "quantization": {
     "query_count": 48,
     "top1_agreement": 0.9375,
     "mean_top5_overlap": 0.9916666666666667,
-    "max_score_error": 0.0008324384689331055
+    "max_score_error": 0.0008034706115722656
   }
 }
