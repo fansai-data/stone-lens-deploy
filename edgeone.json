@@ -18,5 +18,10 @@
         }
       ]
     }
-  ]
+  ],
+  "cloudFunctions": {
+    "nodejs": {
+      "maxDuration": 60
+    }
+  }
 }
