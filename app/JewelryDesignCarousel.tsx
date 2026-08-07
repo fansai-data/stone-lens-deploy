@@ -7,15 +7,33 @@ type JewelryItem = { className: string; image: string };
 
 const normalize = (value: string) => value.toLowerCase().replace(/[^a-z0-9]/g, "");
 
+const isJewelryItem = (value: unknown): value is JewelryItem =>
+  typeof value === "object" &&
+  value !== null &&
+  "className" in value &&
+  typeof value.className === "string" &&
+  "image" in value &&
+  typeof value.image === "string";
+
+const loadJewelryItems = async (): Promise<JewelryItem[]> => {
+  const response = await fetch("/jewelry-design/manifest.json");
+  const manifest: unknown = await response.json();
+
+  if (!Array.isArray(manifest) || !manifest.every(isJewelryItem)) {
+    throw new Error("Invalid jewelry manifest");
+  }
+
+  return manifest;
+};
+
 /* 优化：展示 Top‑5 相似石种中所有能够匹配到的首饰灵感图，最多五张。 */
 export default function JewelryDesignCarousel({ gemNames }: { gemNames: string[] }) {
   const [items, setItems] = useState<JewelryItem[]>([]);
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    fetch("/jewelry-design/manifest.json")
-      .then((response) => response.json())
-      .then((next: JewelryItem[]) => setItems(next))
+    loadJewelryItems()
+      .then(setItems)
       .catch(() => setItems([]))
       .finally(() => setLoaded(true));
   }, []);

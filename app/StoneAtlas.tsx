@@ -14,6 +14,26 @@ type AtlasItem = {
   image: string;
 };
 
+const loadGalleryMetadata = async (): Promise<GalleryMetadata> => {
+  const response = await fetch("/model/gallery-metadata.json");
+  const metadata: unknown = await response.json();
+
+  if (
+    typeof metadata !== "object" ||
+    metadata === null ||
+    !("references" in metadata) ||
+    typeof metadata.references !== "object" ||
+    metadata.references === null ||
+    !Object.values(metadata.references).every(
+      (images) => Array.isArray(images) && images.every((image) => typeof image === "string"),
+    )
+  ) {
+    throw new Error("Invalid gallery metadata");
+  }
+
+  return { references: metadata.references as Record<string, string[]> };
+};
+
 const categories: Array<{
   domain: StoneDomain;
   count: number;
@@ -31,9 +51,8 @@ export default function StoneAtlas() {
   const [activeDomain, setActiveDomain] = useState<StoneDomain | null>(null);
 
   useEffect(() => {
-    fetch("/model/gallery-metadata.json")
-      .then((response) => response.json())
-      .then((metadata: GalleryMetadata) => {
+    loadGalleryMetadata()
+      .then((metadata) => {
         const next = Object.entries(metadata.references).map(([key, images]) => {
           const separator = key.indexOf("::");
           const domain = key.slice(0, separator) as StoneDomain;
