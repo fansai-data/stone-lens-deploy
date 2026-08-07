@@ -48,15 +48,7 @@ function allowRequest(id: string): boolean {
 }
 
 async function deepSeekApiKey(): Promise<string | undefined> {
-  if (typeof process !== "undefined" && process.env?.DEEPSEEK_API_KEY) {
-    return process.env.DEEPSEEK_API_KEY;
-  }
-  try {
-    const runtime = await import("cloudflare:workers");
-    return (runtime.env as unknown as { DEEPSEEK_API_KEY?: string }).DEEPSEEK_API_KEY;
-  } catch {
-    return undefined;
-  }
+  return process.env?.DEEPSEEK_API_KEY;
 }
 
 export async function POST(request: Request) {
