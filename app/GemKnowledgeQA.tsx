@@ -83,10 +83,27 @@ export default function GemKnowledgeQA({
           disabled={!isMember}
         />
         <button className="primary-button" disabled={!isMember || loading}>
-          {loading ? "正在回答…" : "询问 AI"}
+          {loading ? (
+            <span className="ai-typing-dots" aria-label="AI 正在思考">
+              <i /><i /><i />
+            </span>
+          ) : (
+            "询问 AI"
+          )}
         </button>
       </form>
-      {(answer || error) && (
+      {loading && (
+        <div className="gem-qa-answer gem-qa-loading" aria-live="polite">
+          <b>DeepSeek V4 Flash 正在思考</b>
+          <p className="ai-thinking-text">
+            <span>正在检索宝石知识库</span>
+            <span className="ai-typing-dots inline">
+              <i /><i /><i />
+            </span>
+          </p>
+        </div>
+      )}
+      {!loading && (answer || error) && (
         <div className={`gem-qa-answer ${error ? "error" : ""}`} aria-live="polite">
           <b>{error ? "暂时无法回答" : "DeepSeek V4 Flash"}</b>
           <p>{error || answer}</p>

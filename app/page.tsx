@@ -427,6 +427,9 @@ export default function Home() {
       }
       setReferenceImageError(false);
       setStage("result");
+      window.setTimeout(() => {
+        document.getElementById("result-area")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 120);
       if (querySource === "upload") {
         try {
           const thumbnail = await makeHistoryThumbnail(queryImage);
@@ -687,7 +690,7 @@ export default function Home() {
             </div>
 
         {resultVisible && recognition && (
-          <div className="result-area">
+          <div className="result-area" id="result-area">
             <div className="result-summary">
               <div>
                 <span className="result-kicker">MOST SIMILAR CATEGORY</span>
