@@ -1,3 +1,4 @@
+/* StoneLens Next.js config — cache bust v2 */
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
