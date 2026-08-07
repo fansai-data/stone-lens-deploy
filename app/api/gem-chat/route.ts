@@ -30,7 +30,6 @@ function allowRequest(id: string): boolean {
 }
 
 async function deepSeekApiKey(): Promise<string | undefined> {
-  /* 优化：EdgeOne/标准 Next.js 运行时从服务端环境变量读取密钥。 */
   return process.env.DEEPSEEK_API_KEY;
 }
 

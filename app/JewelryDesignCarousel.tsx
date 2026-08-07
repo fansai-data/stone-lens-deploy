@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { chineseNameForStone } from "./stoneKnowledge";
+import { sitePath } from "./sitePath";
 
 type JewelryItem = { className: string; image: string };
 
@@ -16,14 +17,14 @@ const isJewelryItem = (value: unknown): value is JewelryItem =>
   typeof value.image === "string";
 
 const loadJewelryItems = async (): Promise<JewelryItem[]> => {
-  const response = await fetch("/jewelry-design/manifest.json");
+  const response = await fetch(sitePath("/jewelry-design/manifest.json"));
   const manifest: unknown = await response.json();
 
   if (!Array.isArray(manifest) || !manifest.every(isJewelryItem)) {
     throw new Error("Invalid jewelry manifest");
   }
 
-  return manifest;
+  return manifest.map((item) => ({ ...item, image: sitePath(item.image) }));
 };
 
 /* 优化：展示 Top‑5 相似石种中所有能够匹配到的首饰灵感图，最多五张。 */

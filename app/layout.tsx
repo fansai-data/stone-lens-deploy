@@ -1,13 +1,14 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import Providers from "./providers";
+import { sitePath } from "./sitePath";
 
 export const metadata: Metadata = {
   /* 优化 */
   title: "石相 StoneLens — AI 宝石发现与视觉匹配",
   description:
     "拍下手中的宝石、玉石原石或陌生石头，探索最相似的宝石家族、参考样本与典型属性。",
-  manifest: "/manifest.webmanifest",
+  manifest: sitePath("/manifest.webmanifest"),
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
@@ -15,9 +16,9 @@ export const metadata: Metadata = {
   },
   metadataBase: new URL("https://stone.xinyingapp.com"),
   icons: {
-    icon: "/images/diamond-logo.png",
-    shortcut: "/images/diamond-logo.png",
-    apple: "/apple-touch-icon.png",
+    icon: sitePath("/images/diamond-logo.png"),
+    shortcut: sitePath("/images/diamond-logo.png"),
+    apple: sitePath("/apple-touch-icon.png"),
   },
   openGraph: {
     title: "石相 StoneLens",

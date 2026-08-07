@@ -3,6 +3,10 @@
 import { useMutation } from "@tanstack/react-query";
 import { FormEvent, useRef, useState } from "react";
 import { chineseNameForStone } from "./stoneKnowledge";
+import { sitePath } from "./sitePath";
+
+/* 优化：静态页面调用同一套服务器端 AI 接口，密钥不会暴露在浏览器中。 */
+const gemChatEndpoint = process.env.NEXT_PUBLIC_GEM_CHAT_API || sitePath("/api/gem-chat");
 
 type GemChatRequest = {
   gemName: string;
@@ -18,7 +22,7 @@ type GemChatFailure = {
 };
 
 async function askGemKnowledge(input: GemChatRequest): Promise<string> {
-  const response = await fetch("/api/gem-chat", {
+  const response = await fetch(gemChatEndpoint, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(input),
@@ -69,6 +73,7 @@ export default function GemKnowledgeQA({
 
   const error = validationError ?? questionMutation.error?.message;
   const answer = questionMutation.data;
+  const loading = questionMutation.isPending;
 
   return (
     <section className={`gem-qa ${isMember ? "" : "is-locked"}`} aria-label="AI 宝石知识问答">
@@ -92,11 +97,28 @@ export default function GemKnowledgeQA({
           aria-label="向 AI 提问"
           disabled={!isMember}
         />
-        <button className="primary-button" disabled={!isMember || questionMutation.isPending}>
-          {questionMutation.isPending ? "正在回答…" : "询问 AI"}
+        <button className="primary-button" disabled={!isMember || loading}>
+          {loading ? (
+            <span className="ai-typing-dots" aria-label="AI 正在思考">
+              <i /><i /><i />
+            </span>
+          ) : (
+            "询问 AI"
+          )}
         </button>
       </form>
-      {(answer || error) && (
+      {loading && (
+        <div className="gem-qa-answer gem-qa-loading" aria-live="polite">
+          <b>DeepSeek V4 Flash 正在思考</b>
+          <p className="ai-thinking-text">
+            <span>正在检索宝石知识库</span>
+            <span className="ai-typing-dots inline">
+              <i /><i /><i />
+            </span>
+          </p>
+        </div>
+      )}
+      {!loading && (answer || error) && (
         <div className={`gem-qa-answer ${error ? "error" : ""}`} aria-live="polite">
           <b>{error ? "暂时无法回答" : "DeepSeek V4 Flash"}</b>
           <p>{error || answer}</p>

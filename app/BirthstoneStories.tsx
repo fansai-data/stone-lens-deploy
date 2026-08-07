@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { sitePath } from "./sitePath";
 
 type Birthstone = { name: string; english: string; image: string; story: string; meaning: string };
 type MonthStory = { month: string; englishMonth: string; representative: Birthstone; stones: Birthstone[] };
 
-const image = (name: string) => `/atlas-thumbs/gemstone--${name}--1.webp`;
+const image = (name: string) => sitePath(`/atlas-thumbs/gemstone--${name}--1.webp`);
 
 const months: MonthStory[] = [
   { month: "一月", englishMonth: "January", representative: { name: "石榴石", english: "Garnet", image: image("Garnet-Red"), story: "名称常被认为源自“石榴”一词；古代红色石榴石常被制成护符和印章。", meaning: "传统象征友谊、忠诚与平安归来。" }, stones: [] },

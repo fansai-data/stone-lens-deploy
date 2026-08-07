@@ -21,6 +21,8 @@ import StoneAtlas from "./StoneAtlas";
 import BirthstoneStories from "./BirthstoneStories";
 import JewelryDesignCarousel from "./JewelryDesignCarousel";
 import PwaInstallPrompt from "./PwaInstallPrompt";
+import { sitePath } from "./sitePath";
+import ImageCropper from "./ImageCropper";
 import {
   bilingualCountryName,
   crystalSystemForStone,
@@ -49,24 +51,24 @@ type HistoryEntry = { id: string; time: string; chineseName: string; englishName
 
 /* 优化 */
 const heroSlides = [
-  { image: "/showcase/hero-emerald-hd.webp", name: "祖母绿", english: "Emerald", type: "彩色宝石" },
-  { image: "/showcase/hero-ruby-hd.webp", name: "红宝石", english: "Ruby", type: "彩色宝石" },
-  { image: "/showcase/hero-sapphire-hd.webp", name: "蓝宝石", english: "Blue Sapphire", type: "彩色宝石" },
-  { image: "/showcase/hero-jadeite-raw-hd.webp", name: "翡翠原石", english: "Jadeite Raw", type: "玉石原石" },
-  { image: "/showcase/hero-basalt-hd.webp", name: "玄武岩", english: "Basalt", type: "常见岩石" },
+  { image: sitePath("/showcase/hero-emerald-hd.webp"), name: "祖母绿", english: "Emerald", type: "彩色宝石" },
+  { image: sitePath("/showcase/hero-ruby-hd.webp"), name: "红宝石", english: "Ruby", type: "彩色宝石" },
+  { image: sitePath("/showcase/hero-sapphire-hd.webp"), name: "蓝宝石", english: "Blue Sapphire", type: "彩色宝石" },
+  { image: sitePath("/showcase/hero-jadeite-raw-hd.webp"), name: "翡翠原石", english: "Jadeite Raw", type: "玉石原石" },
+  { image: sitePath("/showcase/hero-basalt-hd.webp"), name: "玄武岩", english: "Basalt", type: "常见岩石" },
 ];
 
 /* 优化 */
-const AMETRINE_QUERY_IMAGE = "/model/references/demo-user-ametrine-7.jpg";
-const AMETRINE_REFERENCE_IMAGE = "/model/references/gemstone--Ametrine--1.webp";
+const AMETRINE_QUERY_IMAGE = sitePath("/model/references/demo-user-ametrine-7.jpg");
+const AMETRINE_REFERENCE_IMAGE = sitePath("/model/references/gemstone--Ametrine--1.webp");
 const AMETRINE_DEMO: StoneRecognitionResult = {
   best: { className: "Ametrine", domain: "gemstone", score: 0.987, image: AMETRINE_REFERENCE_IMAGE },
   matches: [
     { className: "Ametrine", domain: "gemstone", score: 0.987, image: AMETRINE_REFERENCE_IMAGE },
-    { className: "Amethyst", domain: "gemstone", score: 0.842, image: "/model/references/gemstone--Amethyst--1.webp" },
-    { className: "Citrine", domain: "gemstone", score: 0.819, image: "/model/references/gemstone--Citrine--1.webp" },
-    { className: "Quartz Lemon", domain: "gemstone", score: 0.764, image: "/model/references/gemstone--Quartz-Lemon--1.webp" },
-    { className: "Quartz Smoky", domain: "gemstone", score: 0.711, image: "/model/references/gemstone--Quartz-Smoky--1.webp" },
+    { className: "Amethyst", domain: "gemstone", score: 0.842, image: sitePath("/model/references/gemstone--Amethyst--1.webp") },
+    { className: "Citrine", domain: "gemstone", score: 0.819, image: sitePath("/model/references/gemstone--Citrine--1.webp") },
+    { className: "Quartz Lemon", domain: "gemstone", score: 0.764, image: sitePath("/model/references/gemstone--Quartz-Lemon--1.webp") },
+    { className: "Quartz Smoky", domain: "gemstone", score: 0.711, image: sitePath("/model/references/gemstone--Quartz-Smoky--1.webp") },
   ],
   referenceImage: AMETRINE_REFERENCE_IMAGE,
   referenceNumber: 1,
@@ -74,6 +76,17 @@ const AMETRINE_DEMO: StoneRecognitionResult = {
 };
 
 /* 优化：比赛静态版在浏览器内保存不可逆密码摘要，不保存明文密码。 */
+/* 优化 */
+function safeImagePath(path: string) {
+  if (!path) return "";
+  if (/^(https?:|blob:|data:)/.test(path)) return path;
+  if (path.startsWith("/stone-lens-deploy/")) return path;
+  if (/^(gemstone|jade_raw|common_rock)--.+\.(webp|jpe?g|png)$/i.test(path)) {
+    return sitePath(`/model/references/${path}`);
+  }
+  return sitePath(path.startsWith("/") ? path : `/${path}`);
+}
+
 async function hashLocalPassword(password: string) {
   const bytes = new TextEncoder().encode(password);
   const digest = await window.crypto.subtle.digest("SHA-256", bytes);
@@ -137,6 +150,9 @@ function profileFor(match: StoneMatch) {
 export default function Home() {
   const [stage, setStage] = useState<Stage>("idle");
   const [queryImage, setQueryImage] = useState<string | null>(null);
+  /* 优化：保留上传原图，允许识别前随时重新框选。 */
+  const [originalQueryImage, setOriginalQueryImage] = useState<string | null>(null);
+  const [cropOpen, setCropOpen] = useState(false);
   const [querySource, setQuerySource] = useState<QuerySource>(null);
   const [freeScans, setFreeScans] = useState(10);
   const [quotaReady, setQuotaReady] = useState(false);
@@ -213,7 +229,7 @@ export default function Home() {
 
   useEffect(() => {
     if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("/sw.js").catch(() => undefined);
+      navigator.serviceWorker.register(sitePath("/sw.js")).catch(() => undefined);
     }
     return () => {
       if (queryImage?.startsWith("blob:")) URL.revokeObjectURL(queryImage);
@@ -241,6 +257,8 @@ export default function Home() {
     if (queryImage?.startsWith("blob:")) URL.revokeObjectURL(queryImage);
     /* 优化 */
     setQueryImage(AMETRINE_QUERY_IMAGE);
+    setOriginalQueryImage(null);
+    setCropOpen(false);
     setQuerySource("demo");
     setRecognition(AMETRINE_DEMO);
     setRecognitionError(null);
@@ -342,12 +360,20 @@ export default function Home() {
     }
     const file = event.target.files?.[0];
     if (!file) return;
-    if (queryImage?.startsWith("blob:")) URL.revokeObjectURL(queryImage);
-    setQueryImage(URL.createObjectURL(file));
-    setQuerySource("upload");
-    setRecognition(null);
-    setRecognitionError(null);
-    setStage("ready");
+    /* 优化：先读取原图并打开手动框选，确认后才进入可识别状态。 */
+    const reader = new FileReader();
+    reader.onload = () => {
+      const image = typeof reader.result === "string" ? reader.result : null;
+      if (!image) return;
+      setOriginalQueryImage(image);
+      setQueryImage(null);
+      setQuerySource("upload");
+      setRecognition(null);
+      setRecognitionError(null);
+      setStage("idle");
+      setCropOpen(true);
+    };
+    reader.readAsDataURL(file);
   };
 
   /* 优化：所有上传入口统一执行登录检查。 */
@@ -406,6 +432,9 @@ export default function Home() {
       }
       setReferenceImageError(false);
       setStage("result");
+      window.setTimeout(() => {
+        document.getElementById("result-area")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 120);
       if (querySource === "upload") {
         try {
           const thumbnail = await makeHistoryThumbnail(queryImage);
@@ -438,6 +467,8 @@ export default function Home() {
   const reset = () => {
     if (queryImage?.startsWith("blob:")) URL.revokeObjectURL(queryImage);
     setQueryImage(null);
+    setOriginalQueryImage(null);
+    setCropOpen(false);
     setQuerySource(null);
     setRecognition(null);
     setRecognitionError(null);
@@ -450,7 +481,7 @@ export default function Home() {
       <header className="topbar">
         <a className="brand" href="#top" aria-label="石相首页">
           {/* 优化 */}
-          <img className="brand-logo" src="/images/diamond-logo.png" alt="石相 StoneLens Logo" />
+          <img className="brand-logo" src={sitePath("/images/diamond-logo.png")} alt="石相 StoneLens Logo" />
           <span>
             <b>石相</b>
             <small>StoneLens</small>
@@ -469,7 +500,8 @@ export default function Home() {
               ? `${currentUser.username} · ${currentUser.role === "admin" ? "管理员" : "用户"}${isMember ? " · 👑 会员" : ""}`
               : "登录 / 注册"}
           </button>
-          <button className="account-button" onClick={openMembership}>开通会员</button>
+          {/* 优化：会员开通后不再重复显示购买入口。 */}
+          {!isMember && <button className="account-button" onClick={openMembership}>开通会员</button>}
         </div>
       </header>
 
@@ -575,7 +607,7 @@ export default function Home() {
                     ) : (
                       <img
                         key={recognition.referenceImage}
-                        src={recognition.referenceImage}
+                        src={safeImagePath(recognition.referenceImage)}
                         alt={`${recognition.best.className} 类别参考图`}
                         loading="eager"
                         decoding="sync"
@@ -608,6 +640,10 @@ export default function Home() {
                       <small>请尽量上传背景干净、石头主体清晰的照片</small>
                     </div>
                   </button>
+                )}
+                {/* 优化：识别前可返回原图重新框选石头主体。 */}
+                {queryImage && querySource === "upload" && originalQueryImage && stage !== "analyzing" && (
+                  <button type="button" className="recrop-button" onClick={() => setCropOpen(true)}>重新框选</button>
                 )}
                 <input
                   ref={fileInput}
@@ -659,7 +695,7 @@ export default function Home() {
             </div>
 
         {resultVisible && recognition && (
-          <div className="result-area">
+          <div className="result-area" id="result-area">
             <div className="result-summary">
               <div>
                 <span className="result-kicker">MOST SIMILAR CATEGORY</span>
@@ -723,7 +759,7 @@ export default function Home() {
               <div className="match-grid">
                 {recognition.matches.map((match, index) => (
                   <div className="match-card" key={`${match.domain}-${match.className}`}>
-                    <img src={match.image} alt={`${match.className} 参考样本`} />
+                    <img src={safeImagePath(match.image)} alt={`${match.className} 参考样本`} />
                     <span>#{index + 1}</span>
                     <div><b>{chineseNameForStone(match.className)}</b><small>{match.className} · {match.score.toFixed(3)}</small></div>
                   </div>
@@ -762,7 +798,7 @@ export default function Home() {
       <footer>
         <div className="brand footer-brand">
           {/* 优化 */}
-          <img className="brand-logo" src="/images/diamond-logo.png" alt="石相 StoneLens Logo" />
+          <img className="brand-logo" src={sitePath("/images/diamond-logo.png")} alt="石相 StoneLens Logo" />
           <span><b>石相 StoneLens</b><small>视觉相似检索实验室</small></span>
         </div>
         <p>
@@ -818,6 +854,25 @@ export default function Home() {
 
       {/* 优化 */}
       {showMembership && <MembershipView onClose={closeMembership} onPaymentSuccess={activateMembership} isMember={isMember} />}
+
+      {/* 优化：只有确认框选后，裁剪图才会进入识别与历史记录流程。 */}
+      {cropOpen && originalQueryImage && (
+        <ImageCropper
+          imageUrl={originalQueryImage}
+          onCancel={() => {
+            setCropOpen(false);
+            if (!queryImage) reset();
+          }}
+          onApply={(croppedImage) => {
+            setQueryImage(croppedImage);
+            setQuerySource("upload");
+            setRecognition(null);
+            setRecognitionError(null);
+            setStage("ready");
+            setCropOpen(false);
+          }}
+        />
+      )}
     </main>
   );
 }
