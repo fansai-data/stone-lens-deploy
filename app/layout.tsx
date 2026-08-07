@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import Providers from "./providers";
 
 export const metadata: Metadata = {
   /* 优化 */
@@ -12,8 +13,7 @@ export const metadata: Metadata = {
     statusBarStyle: "black-translucent",
     title: "石相",
   },
-  /* 优化：部署后可通过环境变量覆盖社交分享链接的站点根地址。 */
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"),
+  metadataBase: new URL("https://stone.xinyingapp.com"),
   icons: {
     icon: "/images/diamond-logo.png",
     shortcut: "/images/diamond-logo.png",
@@ -46,7 +46,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-CN">
-      <body>{children}</body>
+      <body><Providers>{children}</Providers></body>
     </html>
   );
 }

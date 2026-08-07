@@ -28,11 +28,12 @@ export default function PwaInstallPrompt() {
     if (isStandalone()) return;
     const dismissed = window.localStorage.getItem("stonelens-pwa-prompt-dismissed") === "true";
     if (isAppleMobile()) {
-      if (!dismissed) {
+      if (dismissed) return;
+      const animationFrame = window.requestAnimationFrame(() => {
         setPlatform("ios");
         setHidden(false);
-      }
-      return;
+      });
+      return () => window.cancelAnimationFrame(animationFrame);
     }
 
     const onBeforeInstall = (event: Event) => {

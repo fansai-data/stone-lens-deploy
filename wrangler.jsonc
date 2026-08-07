@@ -1,0 +1,24 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "stone-lens",
+  "account_id": "4e038c36570cefa0c94ab0106bed9021",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2026-08-07",
+  "compatibility_flags": [
+    "nodejs_compat",
+    "global_fetch_strictly_public"
+  ],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "routes": [
+    {
+      "pattern": "stone.xinyingapp.com",
+      "custom_domain": true
+    }
+  ],
+  "observability": {
+    "enabled": true
+  }
+}

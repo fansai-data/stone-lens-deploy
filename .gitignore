@@ -4,13 +4,18 @@
 # Next.js output
 /.next
 /out
+/.open-next
+/.wrangler
 
 # local environment and logs
 .env*
 !.env.example
+.dev.vars
 *.log
 
 # editor and system files
 .DS_Store
 Thumbs.db
 *.tsbuildinfo
+/work
+/outputs

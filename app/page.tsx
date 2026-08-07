@@ -176,21 +176,26 @@ export default function Home() {
     const userQuota = storedUser?.role === "user"
       ? window.localStorage.getItem(`stonelens-free-scans-${storedUser.username}`) || window.localStorage.getItem("stonelens-user-free-scans")
       : window.localStorage.getItem("stonelens-free-scans");
-    if (userQuota ?? storedQuota) {
-      const parsed = Number(userQuota ?? storedQuota);
-      if (Number.isFinite(parsed)) setFreeScans(Math.max(0, Math.min(10, parsed)));
-    }
-    setCurrentUser(storedUser);
-    window.localStorage.removeItem("stonelens-demo-user");
-    /* 优化：会员状态绑定已登录账号；访客不读取旧的设备级会员标记。 */
-    setDeviceMember(storedUser?.role === "user" && window.localStorage.getItem(`stonelens-membership-active-${storedUser.username}`) === "true");
-    window.localStorage.removeItem("stonelens-membership-active");
+    const parsedQuota = userQuota ?? storedQuota;
+    let storedHistory: HistoryEntry[] = [];
     try {
-      setHistory(JSON.parse(window.localStorage.getItem("stonelens-history") || "[]"));
+      storedHistory = JSON.parse(window.localStorage.getItem("stonelens-history") || "[]");
     } catch {
-      setHistory([]);
+      storedHistory = [];
     }
-    setQuotaReady(true);
+    window.localStorage.removeItem("stonelens-demo-user");
+    window.localStorage.removeItem("stonelens-membership-active");
+    const animationFrame = window.requestAnimationFrame(() => {
+      if (parsedQuota) {
+        const parsed = Number(parsedQuota);
+        if (Number.isFinite(parsed)) setFreeScans(Math.max(0, Math.min(10, parsed)));
+      }
+      setCurrentUser(storedUser);
+      setDeviceMember(storedUser?.role === "user" && window.localStorage.getItem(`stonelens-membership-active-${storedUser.username}`) === "true");
+      setHistory(storedHistory);
+      setQuotaReady(true);
+    });
+    return () => window.cancelAnimationFrame(animationFrame);
   }, []);
 
   useEffect(() => {
