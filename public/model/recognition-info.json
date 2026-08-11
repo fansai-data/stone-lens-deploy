@@ -1,19 +1,15 @@
 {
   "checkpoint_classes": 106,
   "device": "cuda",
-  "gallery_count": 5451,
+  "gallery_count": 3412,
   "embedding_dimension": 1280,
   "reference_classes": 106,
-  "export": {
-    "onnx_bytes": 8868540,
-    "max_abs_error": 1.30385160446167e-07,
-    "cosine_similarity": 1.0,
-    "output_norm": 1.0
+  "source_checkpoint": "gemstone_model_106classes.pt",
+  "balanced_gallery": {
+    "enabled": true,
+    "target_per_class": 34
   },
-  "quantization": {
-    "query_count": 48,
-    "top1_agreement": 0.9375,
-    "mean_top5_overlap": 0.9916666666666667,
-    "max_score_error": 0.0008034706115722656
+  "export": {
+    "onnx_bytes": 9092719
   }
 }
