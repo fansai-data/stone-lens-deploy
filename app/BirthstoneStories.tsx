@@ -25,6 +25,88 @@ const stone = (name: string, english: string, story: string, care: string, zodia
   name, english, image: image(english.replaceAll(" ", "-")), story, care, zodiac, meaning,
 });
 
+const birthstoneOrigins: Record<string, { countries: string; note: string }> = {
+  "Garnet-Red": { countries: "印度 India、斯里兰卡 Sri Lanka、坦桑尼亚 Tanzania、莫桑比克 Mozambique", note: "石榴石家族产地广泛，红色品种常见于变质岩与砂矿中，不同产地会带来微妙的红调差异。" },
+  Amethyst: { countries: "巴西 Brazil、乌拉圭 Uruguay、赞比亚 Zambia、俄罗斯 Russia", note: "优质紫水晶常来自晶洞或热液脉，颜色从淡紫到深紫，受铁元素与天然辐照影响。" },
+  Aquamarine: { countries: "巴西 Brazil、巴基斯坦 Pakistan、尼日利亚 Nigeria、马达加斯加 Madagascar", note: "海蓝宝石属于绿柱石家族，清澈的蓝绿色调让它很适合做成明亮的大颗粒切割。" },
+  Bloodstone: { countries: "印度 India、巴西 Brazil、澳大利亚 Australia、美国 USA", note: "血石多为深绿色玉髓中带红色斑点，红点常由铁氧化物形成，因此每一颗纹理都不完全相同。" },
+  Diamond: { countries: "博茨瓦纳 Botswana、南非 South Africa、加拿大 Canada、俄罗斯 Russia、澳大利亚 Australia", note: "钻石来自地幔深处，经火山岩筒带到地表；产地会影响开采历史与商业分级背景。" },
+  Emerald: { countries: "哥伦比亚 Colombia、赞比亚 Zambia、巴西 Brazil、阿富汗 Afghanistan", note: "祖母绿以包裹体和裂隙著称，业内常把这些天然痕迹称作“花园”，也是它个性的一部分。" },
+  Pearl: { countries: "中国 China、日本 Japan、澳大利亚 Australia、塔希提 Tahiti、印尼 Indonesia", note: "珍珠不是矿物晶体，而是由贝类孕育的有机宝石，产区与养殖环境会影响光泽、大小和颜色。" },
+  Moonstone: { countries: "斯里兰卡 Sri Lanka、印度 India、缅甸 Myanmar、马达加斯加 Madagascar", note: "月光石属于长石家族，迷人的蓝白晕彩来自内部层状结构对光线的散射。" },
+  Alexandrite: { countries: "俄罗斯 Russia、巴西 Brazil、斯里兰卡 Sri Lanka、坦桑尼亚 Tanzania", note: "亚历山大石以变色效应闻名，日光与灯光下呈现不同色调，因此常被称为“白天祖母绿，夜晚红宝石”。" },
+  Ruby: { countries: "缅甸 Myanmar、莫桑比克 Mozambique、泰国 Thailand、斯里兰卡 Sri Lanka", note: "红宝石属于刚玉，红色主要来自铬元素；缅甸与莫桑比克红宝石在市场上都很有代表性。" },
+  Peridot: { countries: "美国 Arizona、巴基斯坦 Pakistan、缅甸 Myanmar、中国 China、埃及 Egypt", note: "橄榄石有时来自地幔岩，也能在陨石中出现，明亮黄绿色让它很容易和深色背景形成对比。" },
+  Spinel: { countries: "缅甸 Myanmar、斯里兰卡 Sri Lanka、坦桑尼亚 Tanzania、越南 Vietnam", note: "尖晶石曾长期被误认为红宝石，如今因色彩鲜明、火彩干净，逐渐成为很受关注的彩宝。" },
+  "Onyx-Red": { countries: "巴西 Brazil、印度 India、乌拉圭 Uruguay、马达加斯加 Madagascar", note: "缠丝玛瑙与红玛瑙常见条带或层状纹理，适合雕刻和珠串，也很适合展示天然纹路。" },
+  "Sapphire-Blue": { countries: "斯里兰卡 Sri Lanka、缅甸 Myanmar、克什米尔 Kashmir、马达加斯加 Madagascar、澳大利亚 Australia", note: "蓝宝石同属刚玉，蓝色多与铁、钛元素相关；不同产地的蓝调和丝绢感差别明显。" },
+  Opal: { countries: "澳大利亚 Australia、埃塞俄比亚 Ethiopia、墨西哥 Mexico、巴西 Brazil", note: "欧泊的变彩来自内部二氧化硅微球排列，含水特性让它比多数宝石更需要温柔保养。" },
+  Tourmaline: { countries: "巴西 Brazil、尼日利亚 Nigeria、莫桑比克 Mozambique、阿富汗 Afghanistan、美国 USA", note: "碧玺颜色跨度极大，同一晶体中也可能出现双色或多色，是最适合讲“彩虹感”的宝石之一。" },
+  Citrine: { countries: "巴西 Brazil、玻利维亚 Bolivia、马达加斯加 Madagascar、西班牙 Spain", note: "黄水晶属于石英家族，天然黄水晶较少见，市场上也常见由紫水晶或烟晶加热形成的金黄色调。" },
+  Topaz: { countries: "巴西 Brazil、巴基斯坦 Pakistan、斯里兰卡 Sri Lanka、俄罗斯 Russia", note: "托帕石晶体常能长到较大尺寸，颜色从无色、金黄到蓝色都有，切割后亮度很高。" },
+  Tanzanite: { countries: "坦桑尼亚 Tanzania", note: "坦桑石商业级产地几乎集中在坦桑尼亚梅雷拉尼一带，稀有的单一产区是它故事感很强的原因。" },
+  Turquoise: { countries: "伊朗 Iran、中国 China、美国 USA、埃及 Egypt", note: "绿松石常见铁线与孔隙结构，颜色会受铜、铁和围岩影响；佩戴时尤其要远离油污和化学品。" },
+  Zircon: { countries: "柬埔寨 Cambodia、斯里兰卡 Sri Lanka、缅甸 Myanmar、澳大利亚 Australia", note: "锆石拥有很高的色散和明亮火彩，蓝色锆石尤其常见于加热处理后的商业品种。" },
+};
+
+const originFor = (english: string) =>
+  birthstoneOrigins[english] ?? { countries: "主要产地资料整理中", note: "不同产地会影响颜色、包裹体与市场故事，建议结合证书或实物观察判断。" };
+
+const birthstoneStoryMore: Record<string, string> = {
+  "Garnet-Red": "在维多利亚时期，波希米亚石榴石首饰曾风靡欧洲，密镶的小颗红石榴石像烛火一样铺满胸针、项链和戒指，也让它从护身符慢慢走入日常装饰。",
+  Amethyst: "紫水晶在欧洲宗教首饰中也很常见，主教戒指常用紫色宝石来象征节制与精神清明；它既有神话的浪漫，也有一种安静、克制的仪式感。",
+  Aquamarine: "20 世纪，巴西曾将一批高品质海蓝宝石赠予美国第一夫人埃莉诺·罗斯福，后来被制作成珠宝收藏，也让海蓝宝石多了一层外交礼物的优雅故事。",
+  Bloodstone: "血石的红斑让古人很容易联想到勇气、牺牲和守护，因此它常被雕刻成印章、护符或宗教题材小件，气质比海蓝宝石更厚重。",
+  Diamond: "钻石后来成为订婚戒指的经典主石，也进入许多王室冠冕和博物馆收藏。著名的希望钻石曾与法国王室宝库、珠宝商 Harry Winston 和史密森尼博物馆联系在一起。",
+  Emerald: "埃及艳后克利奥帕特拉对祖母绿的喜爱几乎成了宝石史中最有画面感的故事之一；从古埃及到哥伦比亚矿区，祖母绿一直与权力、春天和生命力相连。",
+  Pearl: "珍珠在肖像画中常被用来表现身份与端庄。伊丽莎白一世的画像里常见大量珍珠装饰，到了 20 世纪，Coco Chanel 又把多层珍珠项链变成现代时装符号。",
+  Moonstone: "新艺术运动时期，珠宝大师 René Lalique 等设计师偏爱带有朦胧光感的宝石，月光石因此很适合被做成花叶、昆虫和女性轮廓等柔美题材。",
+  Alexandrite: "亚历山大石的命名与俄国沙皇亚历山大二世相关，它的红绿变色又正好呼应俄罗斯帝国军服色彩，因此常被赋予幸运、转折和时代记忆。",
+  Ruby: "红宝石长期是王权与热情的象征。现代珠宝史中，Elizabeth Taylor 收藏过醒目的红宝石珠宝套装，也让红宝石继续保持戏剧化、强存在感的气质。",
+  Peridot: "橄榄石在古埃及红海岛屿 Zabargad 的开采故事很有传奇感；夜间寻矿的传说，让它不像一般绿色宝石那样清冷，而带着一点太阳与火山的气息。",
+  Spinel: "英国王冠上的“黑王子红宝石”后来被确认其实是尖晶石，这件事让尖晶石从被误认的配角变成了宝石史里的主角之一。",
+  "Onyx-Red": "玛瑙类宝石在古罗马印章戒指和护身符中十分常见，层状纹理适合雕刻，也适合承载家族标记、军团符号和私人印记。",
+  "Sapphire-Blue": "维多利亚女王在婚礼当天佩戴了阿尔伯特亲王赠送的蓝宝石钻石胸针；后来戴安娜王妃的蓝宝石订婚戒指，又让蓝宝石成为现代王室珠宝记忆的一部分。",
+  Opal: "欧泊曾因色彩变幻被赋予神秘感。维多利亚女王喜欢欧泊，并曾把欧泊首饰赠予女儿们，这在一定程度上帮助它摆脱了“带来厄运”的迷信阴影。",
+  Tourmaline: "碧玺因为颜色跨度极大，很受现代珠宝设计师欢迎；帕拉伊巴碧玺的霓虹蓝绿色更是让碧玺在当代彩宝市场中拥有极高辨识度。",
+  Citrine: "黄水晶常被称作“商人之石”，这种说法更像文化寓意而非科学功效；在首饰设计中，它的金黄色调很容易营造阳光、丰盛和复古感。",
+  Topaz: "托帕石在欧洲宫廷和宗教首饰中都出现过，黄金色托帕石尤其适合与太阳、丰收和温暖意象相连；蓝色托帕石则更偏现代、清爽。",
+  Tanzanite: "坦桑石发现时间很晚，却迅速进入高级珠宝视野。Tiffany & Co. 曾推动它走向国际市场，也让这种来自单一产区的蓝紫色宝石有了现代商业传奇。",
+  Turquoise: "绿松石在波斯、古埃及和美洲原住民文化中都很重要，它既可以出现在宫殿装饰中，也可以被做成银饰、护符和马具装饰。",
+  Zircon: "锆石常因名字与人造立方氧化锆混淆，但天然锆石有自己的火彩与历史。中世纪欧洲传说里，它常与安眠、智慧和驱散阴影联系在一起。",
+};
+
+const birthstoneLegacy: Record<string, string> = {
+  "Garnet-Red": "历史线索：19 世纪波希米亚石榴石首饰曾是欧洲流行风格。",
+  Amethyst: "历史线索：紫水晶常见于王室、宗教戒指与主教饰品。",
+  Aquamarine: "名人线索：埃莉诺·罗斯福曾收到来自巴西的海蓝宝石礼物。",
+  Bloodstone: "历史线索：中世纪血石常被雕刻成宗教护符和印章。",
+  Diamond: "名人线索：希望钻石曾由 Harry Winston 捐赠给史密森尼博物馆。",
+  Emerald: "名人线索：埃及艳后克利奥帕特拉以喜爱祖母绿闻名。",
+  Pearl: "名人线索：伊丽莎白一世肖像和 Coco Chanel 风格都离不开珍珠。",
+  Moonstone: "历史线索：新艺术运动珠宝中常能看到月光石的柔光。",
+  Alexandrite: "历史线索：亚历山大石与俄国帝国时期的命名故事相连。",
+  Ruby: "名人线索：Elizabeth Taylor 的红宝石珠宝让这种宝石极具戏剧感。",
+  Peridot: "历史线索：古埃及 Zabargad 岛的橄榄石矿曾很著名。",
+  Spinel: "历史线索：英国王冠上的“黑王子红宝石”其实是红色尖晶石。",
+  "Onyx-Red": "历史线索：玛瑙常用于古罗马印章戒指和护身符。",
+  "Sapphire-Blue": "名人线索：维多利亚女王和戴安娜王妃都留下了蓝宝石珠宝故事。",
+  Opal: "名人线索：维多利亚女王曾喜欢并赠送欧泊首饰。",
+  Tourmaline: "设计线索：帕拉伊巴碧玺让现代珠宝中的电光蓝绿色很出圈。",
+  Citrine: "文化线索：黄水晶常被赋予财富、阳光和商贸寓意。",
+  Topaz: "历史线索：金黄色托帕石常与太阳神话和宫廷珠宝相连。",
+  Tanzanite: "品牌线索：Tiffany & Co. 推动坦桑石进入国际珠宝市场。",
+  Turquoise: "历史线索：绿松石横跨波斯、古埃及与美洲原住民装饰传统。",
+  Zircon: "历史线索：天然锆石在中世纪传说中常与智慧和安眠相关。",
+};
+
+const storyFor = (item: Birthstone) => {
+  const more = birthstoneStoryMore[item.english];
+  return more ? `${item.story}${more}` : item.story;
+};
+
+const legacyFor = (english: string) => birthstoneLegacy[english] ?? "历史线索：相关名人与佩戴资料整理中，可结合博物馆藏品和证书继续补充。";
+
 const months: MonthStory[] = [
   { month: "一月", englishMonth: "January", representative: stone("石榴石", "Garnet-Red", "据《圣经》记载，诺亚曾以一枚巨大的石榴石作为灯笼，照亮方舟在黑暗中的航行。古人也相信它能为夜行旅人指引方向。", "硬度 7–7.5；日常佩戴耐久，避免剧烈撞击。", "摩羯座 · Capricorn（12.22–1.19）", "友谊、忠诚与平安归来"), stones: [] },
   { month: "二月", englishMonth: "February", representative: stone("紫水晶", "Amethyst", "希腊神话中，少女阿米瑟斯特被化为白色水晶，酒神悔悟后将葡萄酒洒在雕像上，水晶由此染成紫色。", "避免长时间暴晒，以免颜色逐渐变淡。", "水瓶座 · Aquarius（1.20–2.18）", "平静、清醒与内在力量"), stones: [] },
@@ -86,12 +168,27 @@ export default function BirthstoneStories() {
             <div><span>{selected.englishMonth.toUpperCase()} BIRTHSTONES · 生辰石</span><h3>{selected.month}生辰石</h3></div>
           </div>
           <div className="birthstone-detail-grid">
-            {selected.stones.map((item) => (
+            {selected.stones.map((item) => {
+              const origin = originFor(item.english);
+              return (
               <article key={item.english}>
                 <img src={item.image} alt={`${item.name} ${item.english}`} loading="lazy" />
-                <div><h4>{item.name}<small>{item.english.replaceAll("-", " ")}</small></h4><p>{item.story}</p><dl><div><dt>保养建议</dt><dd>{item.care}</dd></div><div><dt>适配星座</dt><dd>{item.zodiac}</dd></div></dl><b>象征：{item.meaning}</b></div>
+                <div>
+                  <h4>{item.name}<small>{item.english.replaceAll("-", " ")}</small></h4>
+                  <p>{storyFor(item)}</p>
+                  <dl>
+                    <div><dt>保养建议</dt><dd>{item.care}</dd></div>
+                    <div><dt>适配星座</dt><dd>{item.zodiac}</dd></div>
+                    <div className="birthstone-origin"><dt>主要产地</dt><dd>{origin.countries}</dd></div>
+                  </dl>
+                  <div className="birthstone-extra">
+                    <b>象征：{item.meaning}</b>
+                    <span>{origin.note}</span>
+                    <span>{legacyFor(item.english)}</span>
+                  </div>
+                </div>
               </article>
-            ))}
+            );})}
           </div>
           <button className="birthstone-collapse-bottom" onClick={() => setSelected(null)}>收起详情 ×</button>
           <a href="https://www.gia.edu/birthstones" target="_blank" rel="noreferrer">资料参考：GIA 生辰石指南 ↗</a>

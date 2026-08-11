@@ -3754,13 +3754,20 @@ main {
 .birthstone-detail-grid article > div { align-self: center; }
 .birthstone-detail-grid h4 { margin: 0; font: 500 25px "STSong", "Songti SC", serif; }
 .birthstone-detail-grid h4 small { margin-left: 9px; color: var(--muted); font: 500 12px Inter, sans-serif; }
-.birthstone-detail-grid p { margin: 12px 0; color: #665e6b; font-size: 14px; line-height: 1.8; }
+.birthstone-detail-grid p { margin: 12px 0; color: #665e6b; font-size: 14px; line-height: 1.95; }
 .birthstone-detail-grid article b { color: #6846a8; font-size: 13px; }
-.birthstone-detail-grid dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 14px 0; }
+.birthstone-detail-grid dl { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 14px 0; }
 .birthstone-detail-grid dl > div { position: relative; padding: 12px 14px 12px 17px; background: linear-gradient(135deg, rgba(249,245,252,.92), rgba(255,255,255,.92)); border: 1px solid rgba(105,72,184,.11); border-radius: 12px; }
 .birthstone-detail-grid dl > div::before { position: absolute; top: 12px; bottom: 12px; left: 0; width: 3px; content: ""; background: linear-gradient(#b786db, #7550ad); border-radius: 0 3px 3px 0; }
 .birthstone-detail-grid dt { color: #6846a8; font-size: 11px; font-weight: 800; letter-spacing: .04em; }
 .birthstone-detail-grid dd { margin: 4px 0 0; color: #665e6b; font-size: 12px; line-height: 1.55; }
+.birthstone-detail-grid .birthstone-origin { background: linear-gradient(135deg, rgba(255,251,245,.96), rgba(250,246,255,.94)); border-color: rgba(178,130,79,.16); }
+.birthstone-detail-grid .birthstone-origin::before { background: linear-gradient(#d9b46a, #8f58bc); }
+.birthstone-extra { display: grid; gap: 8px; margin-top: 12px; padding: 13px 15px; background: rgba(255,255,255,.64); border: 1px solid rgba(123,63,175,.10); border-radius: 14px; box-shadow: inset 0 1px 0 rgba(255,255,255,.85); }
+.birthstone-extra span { position: relative; padding-left: 16px; color: #75677d; font-size: 12px; line-height: 1.7; }
+.birthstone-extra span + span { padding-top: 8px; border-top: 1px solid rgba(123,63,175,.08); }
+.birthstone-extra span + span::before { top: calc(.78em + 8px); background: #d0a65f; box-shadow: 0 0 0 4px rgba(208,166,95,.13); }
+.birthstone-extra span::before { position: absolute; top: .78em; left: 0; width: 7px; height: 7px; content: ""; background: #b98cda; border-radius: 999px; box-shadow: 0 0 0 4px rgba(185,140,218,.13); transform: translateY(-50%); }
 .birthstone-collapse-bottom { display: block; margin: 24px auto 0; padding: 11px 20px; color: #6846a8; background: #fff; border: 1px solid rgba(105,72,184,.22); border-radius: 999px; box-shadow: 0 10px 26px rgba(63,37,82,.07); font-weight: 750; cursor: pointer; transition: transform 200ms ease, box-shadow 200ms ease; }
 .birthstone-collapse-bottom:hover { box-shadow: 0 14px 32px rgba(63,37,82,.11); transform: translateY(-2px); }
 .birthstone-detail > a { display: inline-flex; margin-top: 20px; color: #6948b8; font-size: 12px; }
