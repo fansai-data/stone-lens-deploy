@@ -3,42 +3,53 @@
 import { useState } from "react";
 import { sitePath } from "./sitePath";
 
-type Birthstone = { name: string; english: string; image: string; story: string; meaning: string };
-type MonthStory = { month: string; englishMonth: string; representative: Birthstone; stones: Birthstone[] };
+type Birthstone = {
+  name: string;
+  english: string;
+  image: string;
+  story: string;
+  care: string;
+  zodiac: string;
+  meaning: string;
+};
+
+type MonthStory = {
+  month: string;
+  englishMonth: string;
+  representative: Birthstone;
+  stones: Birthstone[];
+};
 
 const image = (name: string) => sitePath(`/atlas-thumbs/gemstone--${name}--1.webp`);
+const stone = (name: string, english: string, story: string, care: string, zodiac: string, meaning: string): Birthstone => ({
+  name, english, image: image(english.replaceAll(" ", "-")), story, care, zodiac, meaning,
+});
 
 const months: MonthStory[] = [
-  { month: "一月", englishMonth: "January", representative: { name: "石榴石", english: "Garnet", image: image("Garnet-Red"), story: "名称常被认为源自“石榴”一词；古代红色石榴石常被制成护符和印章。", meaning: "传统象征友谊、忠诚与平安归来。" }, stones: [] },
-  { month: "二月", englishMonth: "February", representative: { name: "紫水晶", english: "Amethyst", image: image("Amethyst"), story: "紫水晶在古希腊语传统中与清醒、自持的故事相连，曾长期是珍贵的王室紫色宝石。", meaning: "传统象征平静、清醒与内在力量。" }, stones: [] },
-  { month: "三月", englishMonth: "March", representative: { name: "海蓝宝石", english: "Aquamarine", image: image("Aquamarine"), story: "清澈蓝色令人联想到海水，欧洲航海传统中常把它视作旅途守护石。", meaning: "传统象征宁静、勇气与清晰表达。" }, stones: [
-    { name: "血石", english: "Bloodstone", image: image("Bloodstone"), story: "深绿色底色上的红色斑点孕育了许多关于勇气和守护的古老故事。", meaning: "传统象征力量、坚韧与守护。" },
+  { month: "一月", englishMonth: "January", representative: stone("石榴石", "Garnet-Red", "据《圣经》记载，诺亚曾以一枚巨大的石榴石作为灯笼，照亮方舟在黑暗中的航行。古人也相信它能为夜行旅人指引方向。", "硬度 7–7.5；日常佩戴耐久，避免剧烈撞击。", "摩羯座 · Capricorn（12.22–1.19）", "友谊、忠诚与平安归来"), stones: [] },
+  { month: "二月", englishMonth: "February", representative: stone("紫水晶", "Amethyst", "希腊神话中，少女阿米瑟斯特被化为白色水晶，酒神悔悟后将葡萄酒洒在雕像上，水晶由此染成紫色。", "避免长时间暴晒，以免颜色逐渐变淡。", "水瓶座 · Aquarius（1.20–2.18）", "平静、清醒与内在力量"), stones: [] },
+  { month: "三月", englishMonth: "March", representative: stone("海蓝宝石", "Aquamarine", "地中海水手相信海蓝宝石来自美人鱼的宝箱，出海时佩戴可以平息海浪、保佑平安归来。", "硬度 7.5–8，较耐磨；避免强烈碰撞。", "双鱼座 · Pisces（2.19–3.20）", "宁静、勇气与清晰表达"), stones: [stone("血石", "Bloodstone", "中世纪传说认为，血石是基督的鲜血滴落在碧玉上形成的守护石。", "硬度约 7；避免强酸和强烈化学品。", "双鱼座 · Pisces（2.19–3.20）", "力量、坚韧与守护")] },
+  { month: "四月", englishMonth: "April", representative: stone("钻石", "Diamond", "古印度人相信钻石是闪电击中岩石时诞生的碎片；希腊人称它为 adamas，意为“不可征服”。", "硬度 10，但仍需避免撞击解理面；远离油脂。", "白羊座 · Aries（3.21–4.19）", "坚定、纯粹与恒久承诺"), stones: [] },
+  { month: "五月", englishMonth: "May", representative: stone("祖母绿", "Emerald", "相传埃及艳后克利奥帕特拉酷爱祖母绿。古巴比伦传说则把它与春天女神和土地丰收联系在一起。", "性脆易碎，避免高温和超声波；用温水与软布清洁。", "金牛座 · Taurus（4.20–5.20）", "希望、新生与洞察"), stones: [] },
+  { month: "六月", englishMonth: "June", representative: stone("珍珠", "Pearl", "古人认为珍珠是月光落入海中凝成的泪珠，也有人把它想象成人鱼哭泣时留下的温柔印记。", "硬度 2.5–4.5；远离香水、化妆品和汗水，佩戴后用软布擦干。", "双子座 · Gemini（5.21–6.20）", "纯洁、温柔与圆满"), stones: [
+    stone("月光石", "Moonstone", "印度传说中，月光石是凝固的月光，能让恋人预知未来。", "性脆，避免碰撞和剧烈温差。", "双子座 · Gemini（5.21–6.20）", "直觉、新开始与柔和守护"),
+    stone("亚历山大石", "Alexandrite", "因在日光下呈绿色、灯光下呈红色，亚历山大石的变色被视为幸运与转机的象征。", "硬度约 8.5，日常佩戴耐久；避免剧烈撞击。", "双子座 · Gemini（5.21–6.20）", "变化、平衡与好运"),
   ] },
-  { month: "四月", englishMonth: "April", representative: { name: "钻石", english: "Diamond", image: image("Diamond"), story: "钻石以极高硬度和璀璨火彩闻名，历史上常与坚不可摧和恒久承诺联系。", meaning: "传统象征坚定、纯粹与恒久。" }, stones: [] },
-  { month: "五月", englishMonth: "May", representative: { name: "祖母绿", english: "Emerald", image: image("Emerald"), story: "浓郁绿色长期与春天和新生相连；古代王室也喜爱以祖母绿制作珍贵饰物。", meaning: "传统象征希望、新生与洞察。" }, stones: [] },
-  { month: "六月", englishMonth: "June", representative: { name: "珍珠", english: "Pearl", image: image("Pearl"), story: "珍珠来自水域中的生命过程；古代中东曾流传它是从天而降的泪滴。", meaning: "传统象征纯洁、温柔与圆满。" }, stones: [
-    { name: "亚历山大石", english: "Alexandrite", image: image("Alexandrite"), story: "因不同光线下呈现绿色与红色变化而著名，名称与十九世纪俄国历史相关。", meaning: "传统象征变化、好运与平衡。" },
-    { name: "月光石", english: "Moonstone", image: image("Moonstone"), story: "漂浮般的月光效应让它在多个文化中与月亮和夜色传说相连。", meaning: "传统象征直觉、新开始与柔和守护。" },
+  { month: "七月", englishMonth: "July", representative: stone("红宝石", "Ruby", "缅甸传说中，战士把红宝石视为勇气护符；古印度人称它为“宝石之王”，相信内部燃烧着永恒火焰。", "硬度 9，日常佩戴耐久；避免高温和长时间强光照射。", "巨蟹座 · Cancer（6.21–7.22）", "热情、勇气与成功"), stones: [] },
+  { month: "八月", englishMonth: "August", representative: stone("橄榄石", "Peridot", "古埃及矿工曾在夜晚寻找橄榄石，相信阳光会隐藏它的光芒。", "硬度 6.5–7；避免酸性清洗剂和剧烈撞击。", "狮子座 · Leo（7.23–8.22）", "活力、保护与好心情"), stones: [
+    stone("尖晶石", "Spinel", "历史上不少著名“红宝石”后来被鉴定为尖晶石，它因此拥有一段从误认到正名的传奇。", "硬度 8，耐磨耐热；日常佩戴较稳定。", "狮子座 · Leo（7.23–8.22）", "复苏、热忱与韧性"),
+    stone("缠丝玛瑙", "Onyx-Red", "古罗马军人佩戴雕刻的缠丝玛瑙作为护身符，寄托对稳定与勇气的期望。", "硬度约 7；避免强烈碰撞。", "狮子座 · Leo（7.23–8.22）", "勇气、稳定与守信"),
   ] },
-  { month: "七月", englishMonth: "July", representative: { name: "红宝石", english: "Ruby", image: image("Ruby"), story: "鲜红色让红宝石在许多文化中被视作生命力与权力的象征。", meaning: "传统象征热情、勇气与成功。" }, stones: [] },
-  { month: "八月", englishMonth: "August", representative: { name: "橄榄石", english: "Peridot", image: image("Peridot"), story: "明亮黄绿色常让人联想到阳光；古代矿区曾在夜色中寻找它的光泽。", meaning: "传统象征活力、保护与好心情。" }, stones: [
-    { name: "尖晶石", english: "Spinel", image: image("Spinel"), story: "历史上不少著名“红宝石”后来被证实是红色尖晶石。", meaning: "传统象征复苏、热忱与韧性。" },
-    { name: "缠丝玛瑙", english: "Sardonyx", image: image("Onyx-Red"), story: "层状条带适合雕刻印章，古罗马时代便被用于护身饰物。", meaning: "传统象征勇气、稳定与守信。" },
-  ] },
-  { month: "九月", englishMonth: "September", representative: { name: "蓝宝石", english: "Sapphire", image: image("Sapphire-Blue"), story: "深蓝色长期出现在王室珠宝和宗教饰物中，也存在粉、黄、紫等多种颜色。", meaning: "传统象征智慧、忠诚与高贵。" }, stones: [] },
-  { month: "十月", englishMonth: "October", representative: { name: "欧泊", english: "Opal", image: image("Opal"), story: "变彩效应曾被比作闪电、烟火和星系；贝都因传说认为欧泊伴随雷雨从天空落下。", meaning: "传统象征希望、灵感与想象力。" }, stones: [
-    { name: "碧玺", english: "Tourmaline", image: image("Tourmaline"), story: "名称与“混合颜色的石头”有关，一颗晶体中可同时出现多种颜色。", meaning: "传统象征创造力、包容与丰富情感。" },
-  ] },
-  { month: "十一月", englishMonth: "November", representative: { name: "托帕石", english: "Topaz", image: image("Topaz"), story: "托帕石拥有多种颜色，历史文献中也曾与其他黄色宝石混淆。", meaning: "传统象征真诚、温暖与丰盛。" }, stones: [
-    { name: "黄水晶", english: "Citrine", image: image("Citrine"), story: "金黄色石英因温暖色调而广受喜爱，名称与柑橘色彩相关。", meaning: "传统象征乐观、活力与繁荣。" },
-  ] },
-  { month: "十二月", englishMonth: "December", representative: { name: "坦桑石", english: "Tanzanite", image: image("Tanzanite"), story: "二十世纪发现于坦桑尼亚北部，并因产地而得名，以蓝至蓝紫色著称。", meaning: "传统象征转变、发现与独特个性。" }, stones: [
-    { name: "绿松石", english: "Turquoise", image: image("Turquoise"), story: "古埃及、中国和美洲原住民文化都留下了关于绿松石守护力量的传统。", meaning: "传统象征平安、好运与守护。" },
-    { name: "锆石", english: "Zircon", image: image("Zircon"), story: "天然锆石拥有强烈火彩，中世纪传说曾把它与安睡和驱散恶意联系。", meaning: "传统象征智慧、安宁与光明。" },
+  { month: "九月", englishMonth: "September", representative: stone("蓝宝石", "Sapphire-Blue", "中世纪欧洲人相信蓝宝石能守护纯洁、揭露欺骗；波斯传说则把天空的蓝色归于蓝宝石的倒映。", "硬度 9，仅次于钻石；避免撞击解理面。", "处女座 · Virgo（8.23–9.22）", "智慧、忠诚与高贵"), stones: [] },
+  { month: "十月", englishMonth: "October", representative: stone("欧泊", "Opal", "澳大利亚原住民传说中，造物主踩着彩虹来到大地，每一步都诞生一颗色彩斑斓的欧泊。", "含水量较高，怕干燥和高温；避免暴晒与超声波清洗。", "天秤座 · Libra（9.23–10.22）", "希望、灵感与想象力"), stones: [stone("碧玺", "Tourmaline", "古埃及传说碧玺在从地心上升时穿越彩虹，因此拥有彩虹的多种颜色。", "硬度 7–7.5，日常佩戴耐久；避免剧烈撞击。", "天秤座 · Libra（9.23–10.22）", "创造力、包容与丰富情感")] },
+  { month: "十一月", englishMonth: "November", representative: stone("黄水晶", "Citrine", "古罗马商人把黄水晶雕成护身符放在钱袋中，相信它能守护财富与交易。", "硬度 7；避免长时间暴晒和骤冷骤热。", "天蝎座 · Scorpio（10.23–11.21）", "乐观、活力与丰盛"), stones: [stone("托帕石", "Topaz", "古埃及人认为托帕石被太阳神拉赋予金色光芒，可以驱散黑暗与邪恶。", "硬度 8，耐磨损；避免剧烈撞击和长时间暴晒。", "天蝎座 · Scorpio（10.23–11.21）", "真诚、温暖与丰盛")] },
+  { month: "十二月", englishMonth: "December", representative: stone("坦桑石", "Tanzanite", "坦桑石于 1967 年在坦桑尼亚被发现，当地传说闪电击中岩石后，蓝色火球冷却成了这种宝石。", "硬度 6.5–7，性脆；忌超声波、蒸汽和磕碰。", "射手座 · Sagittarius（11.22–12.21）", "转变、发现与独特个性"), stones: [
+    stone("绿松石", "Turquoise", "波斯人把绿松石镶嵌在宫殿穹顶，认为它会以颜色变化预示风险。", "多孔，远离油污、香水和化学试剂。", "射手座 · Sagittarius（11.22–12.21）", "平安、好运与守护"),
+    stone("锆石", "Zircon", "中世纪欧洲传说把锆石与安睡、驱散邪意和获得智慧联系在一起。", "硬度 7–7.5，但有脆性；避免磕碰。", "射手座 · Sagittarius（11.22–12.21）", "智慧、安宁与光明"),
   ] },
 ];
 
-months.forEach((month) => { if (month.stones.length === 0) month.stones = [month.representative]; else month.stones = [month.representative, ...month.stones]; });
+months.forEach((month) => { month.stones = [month.representative, ...month.stones]; });
 
 export default function BirthstoneStories() {
   const [selected, setSelected] = useState<MonthStory | null>(null);
@@ -51,32 +62,38 @@ export default function BirthstoneStories() {
   return (
     <section className="birthstone-stories" id="birthstones">
       <div className="birthstone-heading">
-        <div><span className="eyebrow">BIRTHSTONE STORIES</span><h2>十二个月，十二种宝石故事</h2></div>
-        <p>点击月份查看该月全部生辰石、传统传说与象征意义。传说内容属于文化故事，不代表科学功效。</p>
+        <div><span className="eyebrow">BIRTHSTONE STORIES · 生辰石趣闻</span><h2>十二个月，十二组宝石故事</h2></div>
+        <p>点击月份，查看该月生辰石的传说、保养建议、适配星座与象征意义。传说属于文化故事，不代表科学功效或购买建议。</p>
       </div>
       <div className="birthstone-month-grid">
         {months.map((month, index) => (
-          <button key={month.englishMonth} onClick={() => openMonth(month)}>
-            <img src={month.representative.image} alt={`${month.month}生辰石${month.representative.name}`} loading="lazy" />
+          <button
+            key={month.englishMonth}
+            className={selected?.englishMonth === month.englishMonth ? "is-active" : undefined}
+            onClick={() => openMonth(month)}
+            aria-label={`查看${month.month}${month.englishMonth}生辰石详情`}
+            aria-pressed={selected?.englishMonth === month.englishMonth}
+          >
+            <img src={month.representative.image} alt={`${month.month}生辰石 ${month.representative.name}`} loading="lazy" />
             <span>{String(index + 1).padStart(2, "0")}</span>
-            <div><small>{month.month} · {month.englishMonth}</small><b>{month.representative.name}</b><em>{month.representative.english}</em></div>
+            <div><small>{month.month} · {month.englishMonth}</small><b>{month.representative.name}</b><em>{month.representative.english.replaceAll("-", " ")}</em><i>EXPLORE STORY&nbsp; →</i></div>
           </button>
         ))}
       </div>
       {selected && (
         <div className="birthstone-detail" id="birthstone-detail">
           <div className="birthstone-detail-head">
-            <div><span>{selected.englishMonth.toUpperCase()} BIRTHSTONES</span><h3>{selected.month}生辰石</h3></div>
-            <button onClick={() => setSelected(null)}>收起详情 ×</button>
+            <div><span>{selected.englishMonth.toUpperCase()} BIRTHSTONES · 生辰石</span><h3>{selected.month}生辰石</h3></div>
           </div>
           <div className="birthstone-detail-grid">
-            {selected.stones.map((stone) => (
-              <article key={stone.english}>
-                <img src={stone.image} alt={`${stone.name} ${stone.english}`} loading="lazy" />
-                <div><h4>{stone.name}<small>{stone.english}</small></h4><p>{stone.story}</p><b>{stone.meaning}</b></div>
+            {selected.stones.map((item) => (
+              <article key={item.english}>
+                <img src={item.image} alt={`${item.name} ${item.english}`} loading="lazy" />
+                <div><h4>{item.name}<small>{item.english.replaceAll("-", " ")}</small></h4><p>{item.story}</p><dl><div><dt>保养建议</dt><dd>{item.care}</dd></div><div><dt>适配星座</dt><dd>{item.zodiac}</dd></div></dl><b>象征：{item.meaning}</b></div>
               </article>
             ))}
           </div>
+          <button className="birthstone-collapse-bottom" onClick={() => setSelected(null)}>收起详情 ×</button>
           <a href="https://www.gia.edu/birthstones" target="_blank" rel="noreferrer">资料参考：GIA 生辰石指南 ↗</a>
         </div>
       )}
