@@ -2,6 +2,7 @@
 
 import {
   ChangeEvent,
+  CSSProperties,
   FormEvent,
   useEffect,
   useMemo,
@@ -157,6 +158,8 @@ export default function Home() {
   const [freeScans, setFreeScans] = useState(10);
   const [quotaReady, setQuotaReady] = useState(false);
   const [recognition, setRecognition] = useState<StoneRecognitionResult | null>(null);
+  /* 优化：Top-5 结果可手动切换，主参考图、3D 模型和产地信息跟随当前选中项变化。 */
+  const [activeMatchIndex, setActiveMatchIndex] = useState(0);
   const [recognitionError, setRecognitionError] = useState<string | null>(null);
   const [showMembership, setShowMembership] = useState(false);
   /* 优化：演示会员状态保存在当前设备，刷新页面后仍然有效。 */
@@ -241,9 +244,12 @@ export default function Home() {
   /* 优化：访客永远不是会员；管理员或已开通会员的登录用户才拥有会员权限。 */
   const isMember = currentUser?.role === "admin" || (currentUser?.role === "user" && deviceMember);
   const hasUnlimitedScans = Boolean(currentUser) && isMember;
+  /* 优化：识别后默认展示第 1 名，用户点击 Top-5 其他结果时切换当前展示对象。 */
+  const activeMatch = recognition?.matches[activeMatchIndex] ?? recognition?.best ?? null;
+  const activeReferenceImage = activeMatch?.image || recognition?.referenceImage || "";
   const recognizedProfile = useMemo(
-    () => (recognition ? profileFor(recognition.best) : null),
-    [recognition],
+    () => (activeMatch ? profileFor(activeMatch) : null),
+    [activeMatch],
   );
   const statusCopy = useMemo(() => {
     if (recognitionError) return recognitionError;
@@ -252,6 +258,16 @@ export default function Home() {
     if (!currentUser) return "访客模式仅可查看示例，登录后可上传识别";
     return "将石头放入识别框，拍摄或上传一张清晰照片";
   }, [currentUser, stage, recognitionError]);
+  /* 优化：给识别工作台增加轻量流程进度，让上传、框选、检索、结果展示的状态更直观。 */
+  const workflowSteps = useMemo(() => {
+    const hasImage = Boolean(queryImage);
+    return [
+      { label: "上传图片", english: "Upload", state: hasImage || resultVisible ? "done" : "active" },
+      { label: "框选主体", english: "Crop", state: cropOpen ? "active" : hasImage || resultVisible ? "done" : "idle" },
+      { label: "AI 快速识别", english: "Match", state: stage === "analyzing" ? "active" : resultVisible ? "done" : "idle" },
+      { label: "查看结果", english: "Result", state: resultVisible ? "active" : "idle" },
+    ];
+  }, [cropOpen, queryImage, resultVisible, stage]);
 
   const chooseDemo = () => {
     if (queryImage?.startsWith("blob:")) URL.revokeObjectURL(queryImage);
@@ -261,6 +277,7 @@ export default function Home() {
     setCropOpen(false);
     setQuerySource("demo");
     setRecognition(AMETRINE_DEMO);
+    setActiveMatchIndex(0);
     setRecognitionError(null);
     setReferenceImageError(false);
     setStage("result");
@@ -427,6 +444,7 @@ export default function Home() {
     try {
       const result = await recognizeStone(queryImage);
       setRecognition(result);
+      setActiveMatchIndex(0);
       if (querySource === "upload" && !hasUnlimitedScans) {
         setFreeScans((value) => Math.max(0, value - 1));
       }
@@ -471,6 +489,7 @@ export default function Home() {
     setCropOpen(false);
     setQuerySource(null);
     setRecognition(null);
+    setActiveMatchIndex(0);
     setRecognitionError(null);
     setStage("idle");
     if (fileInput.current) fileInput.current.value = "";
@@ -606,9 +625,9 @@ export default function Home() {
                       </div>
                     ) : (
                       <img
-                        key={recognition.referenceImage}
-                        src={safeImagePath(recognition.referenceImage)}
-                        alt={`${recognition.best.className} 类别参考图`}
+                        key={activeReferenceImage}
+                        src={safeImagePath(activeReferenceImage)}
+                        alt={`${activeMatch?.className || recognition.best.className} 类别参考图`}
                         loading="eager"
                         decoding="sync"
                         onError={() => setReferenceImageError(true)}
@@ -668,6 +687,14 @@ export default function Home() {
                   </small>
                 </div>
               </div>
+              <div className="scan-flow" aria-label="识别流程进度">
+                {workflowSteps.map((step, index) => (
+                  <div className={`scan-flow-step ${step.state}`} key={step.label}>
+                    <span>{index + 1}</span>
+                    <div><b>{step.label}</b><small>{step.english}</small></div>
+                  </div>
+                ))}
+              </div>
               <div className="action-buttons">
                 {stage === "idle" && (
                   <>
@@ -699,16 +726,24 @@ export default function Home() {
             <div className="result-summary">
               <div>
                 <span className="result-kicker">MOST SIMILAR CATEGORY</span>
-                <h3>{chineseNameForStone(recognition.best.className)} <small>{recognition.best.className}</small></h3>
+                <h3>{chineseNameForStone(activeMatch?.className || recognition.best.className)} <small>{activeMatch?.className || recognition.best.className}</small></h3>
                 <div className="result-tags">
-                  <span>{domainNames[recognition.best.domain]} · {domainEnglishNames[recognition.best.domain]}</span>
+                  <span>{domainNames[activeMatch?.domain || recognition.best.domain]} · {domainEnglishNames[activeMatch?.domain || recognition.best.domain]}</span>
                   <span>真实模型检索</span>
                   <span>多域参考图库</span>
                 </div>
+                {recognizedProfile && (
+                  <div className="result-fact-strip" aria-label="当前识别结果摘要">
+                    <div><span>类别</span><b>{domainNames[recognizedProfile.domain]}</b><small>{domainEnglishNames[recognizedProfile.domain]}</small></div>
+                    <div><span>硬度</span><b>{recognizedProfile.hardness}</b><small>Mohs hardness</small></div>
+                    <div><span>晶系</span><b>{recognizedProfile.crystalSystem}</b><small>Crystal system</small></div>
+                    <div><span>产地</span><b>{recognizedProfile.origins[0] ? bilingualCountryName(recognizedProfile.origins[0]) : "暂无资料"}</b><small>{recognizedProfile.origins.length > 1 ? `另 ${recognizedProfile.origins.length - 1} 个代表产地` : "Principal origin"}</small></div>
+                  </div>
+                )}
               </div>
               <div className="similarity">
-                <span>视觉相似度</span>
-                <b>{recognition.best.score.toFixed(3)}</b>
+                <span>视觉相似度 · Top {activeMatchIndex + 1}</span>
+                <b>{(activeMatch?.score ?? recognition.best.score).toFixed(3)}</b>
                 <small>余弦相似度，并非准确率</small>
               </div>
             </div>
@@ -754,22 +789,40 @@ export default function Home() {
             <div className="top-matches">
               <div className="subheading">
                 <h3>Top‑5 相似结果</h3>
-                <span>按类别最高相似度排序</span>
+                <span>点击任一结果，可切换上方参考样本、模型与产地</span>
               </div>
               <div className="match-grid">
                 {recognition.matches.map((match, index) => (
-                  <div className="match-card" key={`${match.domain}-${match.className}`}>
+                  <button
+                    type="button"
+                    className={`match-card ${index === activeMatchIndex ? "active" : ""}`}
+                    key={`${match.domain}-${match.className}`}
+                    onClick={() => {
+                      /* 优化：切换 Top-5 选中项时重置参考图错误状态，避免上一张加载失败影响下一张。 */
+                      setActiveMatchIndex(index);
+                      setReferenceImageError(false);
+                    }}
+                    aria-pressed={index === activeMatchIndex}
+                  >
                     <img src={safeImagePath(match.image)} alt={`${match.className} 参考样本`} />
                     <span>#{index + 1}</span>
-                    <div><b>{chineseNameForStone(match.className)}</b><small>{match.className} · {match.score.toFixed(3)}</small></div>
-                  </div>
+                    <div>
+                      <b>{chineseNameForStone(match.className)}</b>
+                      <small>{match.className} · {match.score.toFixed(3)}</small>
+                      <i
+                        className="match-score-bar"
+                        aria-hidden="true"
+                        style={{ "--score": `${Math.max(8, Math.min(100, match.score * 100))}%` } as CSSProperties}
+                      />
+                    </div>
+                  </button>
                 ))}
               </div>
             </div>
             {/* 优化 */}
             <JewelryDesignCarousel gemNames={recognition.matches.slice(0, 5).map((match) => match.className)} />
             <GemKnowledgeQA
-              currentGemName={recognition.best.className}
+              currentGemName={activeMatch?.className || recognition.best.className}
               isMember={isMember}
               onOpenMembership={openMembership}
             />

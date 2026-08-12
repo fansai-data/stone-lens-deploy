@@ -8,6 +8,14 @@ import { sitePath } from "./sitePath";
 /* 优化：静态页面调用同一套服务器端 AI 接口，密钥不会暴露在浏览器中。 */
 const gemChatEndpoint = process.env.NEXT_PUBLIC_GEM_CHAT_API || sitePath("/api/gem-chat");
 
+/* 优化：给 AI 问答提供低门槛快捷问题，用户无需自己组织提问。 */
+const quickQuestions = [
+  "这种石头日常佩戴或收藏时怎么保养？",
+  "它适合做成什么类型的首饰？",
+  "普通用户可以从哪些外观特征初步辨别它？",
+  "它常见的主要产地和颜色特点是什么？",
+];
+
 type GemChatRequest = {
   gemName: string;
   question: string;
@@ -88,6 +96,23 @@ export default function GemKnowledgeQA({
           <button className="secondary-button" onClick={onOpenMembership}>查看会员权益</button>
         </div>
       )}
+      <div className="gem-qa-prompts" aria-label="快捷提问">
+        {quickQuestions.map((prompt) => (
+          <button
+            type="button"
+            key={prompt}
+            onClick={() => {
+              /* 优化：快捷问题只填入输入框，不自动发送，避免误触造成 API 请求。 */
+              setQuestion(prompt);
+              setValidationError(null);
+              questionMutation.reset();
+            }}
+            disabled={!isMember}
+          >
+            {prompt}
+          </button>
+        ))}
+      </div>
       <form onSubmit={ask}>
         <input
           value={question}

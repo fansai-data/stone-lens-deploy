@@ -584,7 +584,9 @@ main {
 .action-bar {
   display: flex;
   align-items: center;
+  gap: 14px;
   justify-content: space-between;
+  flex-wrap: wrap;
   min-height: 86px;
   padding: 17px 20px;
   background: #0e1412;
@@ -595,6 +597,7 @@ main {
 
 .status-line {
   display: flex;
+  flex: 1 1 230px;
   gap: 13px;
   align-items: center;
 }
@@ -641,6 +644,7 @@ main {
 
 .action-buttons {
   display: flex;
+  flex: 0 0 auto;
   gap: 10px;
 }
 
@@ -706,6 +710,67 @@ main {
   background: rgba(255, 255, 255, 0.035);
   border: 1px solid var(--line);
   border-radius: 999px;
+}
+
+.result-fact-strip {
+  /* 优化：把硬度、晶系、产地等核心信息提前到识别摘要区，形成更像报告的阅读层级。 */
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 9px;
+  margin-top: 18px;
+  max-width: 820px;
+}
+
+.result-fact-strip > div {
+  position: relative;
+  min-width: 0;
+  padding: 13px 14px;
+  overflow: hidden;
+  background: rgba(255,255,255,.82);
+  border: 1px solid rgba(105, 72, 184, .1);
+  border-radius: 16px;
+  box-shadow: 0 12px 28px rgba(51, 36, 69, .045);
+}
+
+.result-fact-strip > div::before {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  content: "";
+  background: linear-gradient(180deg, #7b3faf, #d9b8ff);
+  opacity: .82;
+}
+
+.result-fact-strip span {
+  display: block;
+  color: #8d8494;
+  font-size: 11px;
+  font-weight: 760;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.result-fact-strip b {
+  display: block;
+  overflow: hidden;
+  margin-top: 7px;
+  color: #2b2434;
+  font-size: 14px;
+  font-weight: 780;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.result-fact-strip small {
+  display: block;
+  overflow: hidden;
+  margin-top: 4px;
+  color: #8f8797;
+  font-size: 11px;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .similarity {
@@ -775,6 +840,8 @@ main {
   align-items: center;
   min-width: 0;
   padding: 8px;
+  color: inherit;
+  font: inherit;
   text-align: left;
   background: #0d1311;
   border: 1px solid var(--line);
@@ -786,6 +853,32 @@ main {
 .match-card:hover {
   border-color: rgba(107, 214, 167, 0.45);
   transform: translateY(-2px);
+}
+
+/* 优化：Top-5 卡片增加当前选中态，让用户知道上方大图/模型正在展示哪一个结果。 */
+.match-card.active {
+  border-color: rgba(105, 72, 184, 0.55);
+  box-shadow: 0 18px 40px rgba(105, 72, 184, 0.14);
+  transform: translateY(-3px);
+}
+
+.match-card.active::after {
+  position: absolute;
+  right: 10px;
+  bottom: 8px;
+  content: "当前查看";
+  color: #6948b8;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .08em;
+}
+
+.match-card.active .match-score-bar {
+  background: rgba(123, 63, 175, .13);
+}
+
+.match-card.active .match-score-bar::after {
+  background: linear-gradient(90deg, #6230a0, #9f61dc, #e4c7ff);
 }
 
 .match-card > img {
@@ -825,6 +918,27 @@ main {
   color: var(--green);
   font-family: Georgia, serif;
   font-size: 16px;
+}
+
+.match-score-bar {
+  /* 优化：Top-5 卡片增加可视化相似度条，减少用户只读小数字的负担。 */
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 5px;
+  overflow: hidden;
+  background: rgba(105, 72, 184, .09);
+  border-radius: 999px;
+}
+
+.match-score-bar::after {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: var(--score);
+  content: "";
+  background: linear-gradient(90deg, #7b3faf, #c794ff);
+  border-radius: inherit;
+  box-shadow: 0 0 12px rgba(123, 63, 175, .24);
 }
 
 .insight-grid {
@@ -1688,6 +1802,89 @@ footer p,
   background: rgba(255, 255, 255, 0.94);
   border-color: var(--line);
   box-shadow: 0 18px 60px rgba(51, 36, 69, 0.05);
+}
+
+.scan-flow {
+  /* 优化：识别流程进度条，帮助用户理解当前处于上传、框选、识别或结果阶段。 */
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  flex: 1 1 460px;
+  padding: 6px;
+  background: linear-gradient(135deg, rgba(105, 72, 184, .055), rgba(255,255,255,.78));
+  border: 1px solid rgba(105, 72, 184, .08);
+  border-radius: 18px;
+}
+
+.scan-flow-step {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+  padding: 10px 11px;
+  color: #8a8290;
+  background: rgba(255,255,255,.58);
+  border: 1px solid transparent;
+  border-radius: 14px;
+  transition: color .2s ease, background .2s ease, border-color .2s ease, transform .2s ease;
+}
+
+.scan-flow-step span {
+  display: grid;
+  flex: 0 0 26px;
+  width: 26px;
+  height: 26px;
+  place-items: center;
+  color: #8d6bbd;
+  font: 700 12px/1 Georgia, serif;
+  background: #f2eafa;
+  border-radius: 999px;
+}
+
+.scan-flow-step b {
+  display: block;
+  overflow: hidden;
+  color: inherit;
+  font-size: 13px;
+  font-weight: 760;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.scan-flow-step small {
+  display: block;
+  margin-top: 2px;
+  color: inherit;
+  font: 10px/1.2 Georgia, serif;
+  letter-spacing: .08em;
+  opacity: .68;
+  text-transform: uppercase;
+}
+
+.scan-flow-step.done {
+  color: #5f4b77;
+  background: rgba(255,255,255,.86);
+}
+
+.scan-flow-step.done span {
+  color: #fff;
+  background: #8f70bd;
+}
+
+.scan-flow-step.active {
+  color: #2f243c;
+  background: #fff;
+  border-color: rgba(105, 72, 184, .22);
+  box-shadow: 0 12px 28px rgba(105, 72, 184, .11);
+  transform: translateY(-1px);
+}
+
+.scan-flow-step.active span {
+  color: #fff;
+  background: linear-gradient(135deg, #7b3faf, #b875f0);
+  box-shadow: 0 0 0 5px rgba(123, 63, 175, .1);
 }
 
 .quota > span,
@@ -3255,6 +3452,9 @@ footer p { font-size: 15px; }
   .recognized-context { grid-template-columns: 1fr; }
   .origin-profile-panel { min-height: 470px; }
   .match-grid { grid-template-columns: repeat(2, 1fr); }
+  .result-fact-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  /* 优化：中小屏下流程条自动变成两列，避免压缩文字。 */
+  .scan-flow { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .birthstone-section { grid-template-columns: 1fr; }
 }
 
@@ -3269,6 +3469,7 @@ footer p { font-size: 15px; }
   .reference-panel.has-result > img,
   .query-panel.has-query > img { min-height: 390px; height: 390px; }
   .result-summary { align-items: flex-start; flex-direction: column; gap: 22px; padding: 26px; }
+  .result-fact-strip { grid-template-columns: 1fr; width: 100%; }
   .similarity { align-items: flex-start; width: 100%; padding: 18px 0 0; border-top: 1px solid var(--line); border-left: 0; }
   .annotated-model { padding: 86px 18px 80px; }
   .model-annotation { width: 160px; }
@@ -3276,6 +3477,7 @@ footer p { font-size: 15px; }
   .crystal-annotation { right: 18px; bottom: 16px; }
   .model-annotation::after { display: none; }
   .match-grid { grid-template-columns: 1fr; }
+  .scan-flow { grid-template-columns: 1fr; }
   .birthstone-section { width: calc(100% - 28px); padding: 35px 24px; }
   .birthstone-scroll { grid-auto-columns: 78%; }
 }
@@ -3657,6 +3859,54 @@ main {
 .atlas-details-head span { color: var(--green); font-size: 10px; font-weight: 800; letter-spacing: .16em; }
 .atlas-details-head h3 { margin: 7px 0 0; font: 500 30px "STSong", "Songti SC", serif; }
 .atlas-details-head > b { color: var(--muted); font-size: 13px; }
+.atlas-search-row {
+  /* 优化：石种图鉴增加中英文快速搜索，提高 106 类浏览效率。 */
+  display: flex;
+  align-items: end;
+  gap: 12px;
+  margin: -8px 0 22px;
+}
+.atlas-search-row label {
+  display: grid;
+  flex: 1;
+  gap: 8px;
+}
+.atlas-search-row label > span {
+  color: #7b5aa6;
+  font-size: 10px;
+  font-weight: 820;
+  letter-spacing: .16em;
+}
+.atlas-search-row input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 15px 17px;
+  color: #30263a;
+  font-size: 15px;
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.94), rgba(249,245,253,.88));
+  border: 1px solid rgba(105, 72, 184, .14);
+  border-radius: 18px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.72), 0 14px 34px rgba(43,29,58,.055);
+  outline: none;
+  transition: border-color .2s ease, box-shadow .2s ease;
+}
+.atlas-search-row input:focus {
+  border-color: rgba(123,63,175,.42);
+  box-shadow: 0 0 0 4px rgba(123,63,175,.08), 0 14px 34px rgba(43,29,58,.075);
+}
+.atlas-search-row input::placeholder { color: #9b92a5; }
+.atlas-search-row > button {
+  min-width: 86px;
+  padding: 14px 16px;
+  color: #6a3f9b;
+  font-size: 13px;
+  font-weight: 760;
+  background: #f4ecfb;
+  border: 1px solid rgba(105, 72, 184, .14);
+  border-radius: 16px;
+  cursor: pointer;
+}
 .atlas-stone-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; }
 .atlas-stone-grid article { position: relative; overflow: hidden; background: #fff; border: 1px solid rgba(105,72,184,.10); border-radius: 16px; box-shadow: 0 12px 28px rgba(43,29,58,.055); transform: translateY(0); transition: transform 330ms cubic-bezier(.2,.7,.2,1), box-shadow 330ms ease, border-color 330ms ease; }
 .atlas-stone-grid article::before { position: absolute; z-index: 2; inset: -55% -115%; content: ""; background: linear-gradient(112deg, transparent 42%, rgba(255,255,255,.38) 49%, transparent 57%); opacity: 0; transform: translateX(-28%); transition: opacity 260ms ease, transform 820ms ease; pointer-events: none; }
@@ -3668,6 +3918,68 @@ main {
 .atlas-stone-grid b { color: #32283a; font-size: 13px; transition: color 220ms ease; }
 .atlas-stone-grid article:hover b { color: #7145a4; }
 .atlas-stone-grid small { overflow: hidden; color: var(--muted); font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
+.atlas-stone-hover {
+  /* 优化：106 类图鉴卡片悬停浮层，展示对应硬度与主要产地。 */
+  position: absolute;
+  inset: auto 8px 8px;
+  z-index: 4;
+  display: grid;
+  gap: 3px;
+  padding: 10px 11px;
+  color: #352844;
+  background:
+    linear-gradient(145deg, rgba(255, 250, 255, .92), rgba(237, 224, 252, .86)),
+    rgba(246, 239, 253, .9);
+  border: 1px solid rgba(123, 63, 175, .16);
+  border-radius: 14px;
+  box-shadow: 0 18px 42px rgba(123, 63, 175, .16);
+  backdrop-filter: blur(14px);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(14px) scale(.97);
+  transition: opacity .24s ease, transform .24s ease;
+}
+.atlas-stone-grid article:hover .atlas-stone-hover,
+.atlas-stone-grid article:focus-within .atlas-stone-hover {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+.atlas-stone-hover span {
+  color: rgba(94, 65, 123, .72);
+  font-size: 9px;
+  font-weight: 820;
+  letter-spacing: .13em;
+}
+.atlas-stone-hover b {
+  color: #4b286d !important;
+  font-size: 13px;
+  line-height: 1.25;
+}
+.atlas-stone-hover p {
+  display: -webkit-box;
+  margin: 0;
+  overflow: hidden;
+  color: rgba(64, 48, 77, .86);
+  font-size: 10.5px;
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+.atlas-empty-result {
+  /* 优化：搜索无结果时给出温和空状态，而不是留下空白区域。 */
+  display: grid;
+  place-items: center;
+  gap: 8px;
+  min-height: 160px;
+  margin-top: 16px;
+  color: #716778;
+  text-align: center;
+  background: rgba(250, 247, 253, .8);
+  border: 1px dashed rgba(105, 72, 184, .18);
+  border-radius: 18px;
+}
+.atlas-empty-result b { color: #44364f; font-size: 17px; }
+.atlas-empty-result p { margin: 0; font-size: 13px; }
 
 .birthstone-stories {
   position: relative;
@@ -3903,6 +4215,36 @@ main {
 .gem-qa-member-notice div { display: grid; gap: 4px; }
 .gem-qa-member-notice b { font-size: 15px; }
 .gem-qa-member-notice span { color: var(--muted); font-size: 13px; }
+.gem-qa-prompts {
+  /* 优化：AI 问答增加快捷提问按钮，降低用户开始对话的门槛。 */
+  display: flex;
+  gap: 9px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+}
+.gem-qa-prompts button {
+  padding: 10px 13px;
+  color: #65428f;
+  font-size: 13px;
+  font-weight: 650;
+  line-height: 1.4;
+  background: linear-gradient(135deg, #f7f1fc, #fff);
+  border: 1px solid rgba(105, 72, 184, .14);
+  border-radius: 999px;
+  box-shadow: 0 8px 22px rgba(105, 72, 184, .055);
+  cursor: pointer;
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+.gem-qa-prompts button:hover:not(:disabled) {
+  border-color: rgba(123, 63, 175, .34);
+  box-shadow: 0 12px 30px rgba(105, 72, 184, .12);
+  transform: translateY(-2px);
+}
+.gem-qa-prompts button:disabled {
+  cursor: not-allowed;
+  filter: grayscale(.2);
+  opacity: .5;
+}
 .gem-qa.is-locked input,
 .gem-qa.is-locked form button { cursor: not-allowed; opacity: .48; filter: grayscale(.35); }
 
@@ -3910,6 +4252,27 @@ main {
 .jewelry-carousel-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; }
 .jewelry-carousel-heading h3 { margin: 6px 0 0; font-family: "STSong", "Songti SC", serif; font-size: 25px; font-weight: 600; }
 .jewelry-carousel-heading > small { color: var(--muted); font-size: 12px; }
+.jewelry-carousel-actions { display: flex; align-items: center; gap: 16px; }
+.jewelry-carousel-actions small { color: var(--muted); font-size: 12px; }
+.jewelry-carousel-actions div { display: flex; gap: 8px; }
+.jewelry-carousel-actions button {
+  /* 优化：首饰灵感切换按钮做成轻量圆形控件，突出可浏览感。 */
+  width: 36px;
+  height: 36px;
+  color: #5f3f9d;
+  font-size: 18px;
+  font-weight: 700;
+  background: #f6f1fb;
+  border: 1px solid rgba(105, 72, 184, .16);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+}
+.jewelry-carousel-actions button:hover {
+  background: #fff;
+  box-shadow: 0 12px 28px rgba(105, 72, 184, .14);
+  transform: translateY(-2px);
+}
 .jewelry-single { margin: 18px auto 0 !important; }
 .jewelry-carousel figure { position: relative; width: min(100%, 720px); margin: 0; overflow: hidden; background: #f5f2f1; border-radius: 20px; }
 .jewelry-carousel figure > img { display: block; width: 100%; height: 390px; object-fit: contain; background: #f8f6f4; }
@@ -3918,11 +4281,36 @@ main {
 .jewelry-carousel figcaption span { color: var(--muted); font: 14px Georgia, serif; }
 .jewelry-empty { display: grid; gap: 8px; }
 .jewelry-empty p { margin: 0; color: var(--muted); }
-/* 优化：Top-5 首饰灵感以居中的等宽网格展示。 */
-.jewelry-inspiration-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; align-items: stretch; margin-top: 18px; }
-.jewelry-inspiration-grid figure { display: flex; width: 100%; height: 100%; flex-direction: column; background: #fff; }
+.jewelry-inspiration-grid {
+  /* 优化：首饰灵感改为横向精品滑轨，卡片更大但页面更紧凑。 */
+  display: flex;
+  gap: 16px;
+  align-items: stretch;
+  margin-top: 20px;
+  overflow-x: auto;
+  padding: 4px 4px 16px;
+  scroll-snap-type: x mandatory;
+  scrollbar-color: rgba(105, 72, 184, .25) transparent;
+  scrollbar-width: thin;
+}
+.jewelry-inspiration-grid figure {
+  display: flex;
+  flex: 0 0 min(340px, 78vw);
+  width: auto;
+  height: 100%;
+  flex-direction: column;
+  background: #fff;
+  border: 1px solid rgba(51, 36, 69, .08);
+  box-shadow: 0 18px 38px rgba(51, 36, 69, .07);
+  scroll-snap-align: start;
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.jewelry-inspiration-grid figure:hover {
+  box-shadow: 0 24px 54px rgba(51, 36, 69, .12);
+  transform: translateY(-3px);
+}
 .jewelry-inspiration-grid figure > img { height: auto !important; aspect-ratio: 1 / 1; object-fit: cover; }
-.jewelry-inspiration-grid figcaption { box-sizing: border-box; min-height: 78px; flex: 1 0 auto; align-items: flex-start; background: #fff; border-top: 1px solid #eee9ef; }
+.jewelry-inspiration-grid figcaption { box-sizing: border-box; min-height: 82px; flex: 1 0 auto; align-items: flex-start; background: #fff; border-top: 1px solid #eee9ef; }
 .jewelry-inspiration-grid figcaption b { display: block; width: 100%; color: #33283a; line-height: 1.45; background: #fff; }
 /* 优化：格式和拍摄建议位于同一上传框内，使用统一字号且不增加底框。 */
 .upload-guidance { display: grid; gap: 5px; justify-items: center; }
@@ -3998,14 +4386,12 @@ main {
 .gem-qa, .jewelry-carousel { margin-top: 18px; }
 
 @media (max-width: 1100px) {
-  .jewelry-inspiration-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .atlas-stone-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .birthstone-month-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .history-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 @media (max-width: 760px) {
-  .jewelry-inspiration-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .atlas-section,
   .birthstone-stories,
   .history-section { width: calc(100% - 28px); padding: 46px 0; }
@@ -4015,7 +4401,15 @@ main {
   .history-heading > div:last-child { width: 100%; align-items: flex-start; flex-direction: column; }
   .atlas-category-grid { grid-template-columns: 1fr; }
   .atlas-category-card { min-height: 220px; }
+  .atlas-search-row { align-items: stretch; flex-direction: column; }
+  .atlas-search-row > button { width: 100%; }
   .atlas-stone-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .atlas-stone-hover {
+    position: static;
+    margin: 0 10px 10px;
+    opacity: 1;
+    transform: none;
+  }
   .atlas-details { padding: 18px; }
   .birthstone-month-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .birthstone-month-grid > button { min-height: 250px; }
@@ -4027,7 +4421,6 @@ main {
 }
 
 @media (max-width: 480px) {
-  .jewelry-inspiration-grid { grid-template-columns: 1fr; }
   .birthstone-month-grid { grid-template-columns: 1fr; }
   .birthstone-detail-grid article { grid-template-columns: 1fr; }
   .birthstone-detail-grid img { width: 100%; height: 210px; }
@@ -4048,8 +4441,11 @@ main {
   .atlas-section { padding-top: 38px; padding-bottom: 38px; }
   .birthstone-stories { margin-bottom: 28px; padding-top: 34px; padding-bottom: 34px; }
   .gem-qa-member-notice { align-items: stretch; flex-direction: column; }
+  .gem-qa-prompts { flex-direction: column; }
+  .gem-qa-prompts button { width: 100%; text-align: left; }
   .jewelry-carousel { padding: 18px; }
-  .jewelry-carousel-heading { align-items: flex-start; flex-direction: column; gap: 6px; }
+  .jewelry-carousel-heading,
+  .jewelry-carousel-actions { align-items: flex-start; flex-direction: column; gap: 6px; }
   .jewelry-carousel figure > img { height: 280px; }
   .payment-section { grid-template-columns: 1fr; }
   .payment-codes { flex-wrap: wrap; justify-content: center; }
