@@ -2118,6 +2118,25 @@ footer p,
   animation: spin 2.8s linear infinite;
 }
 
+.lazy-module-placeholder,
+.lazy-section-placeholder {
+  /* 优化：重组件按需加载时显示轻量占位，避免用户看到空白区域。 */
+  display: grid;
+  min-height: 220px;
+  place-items: center;
+  color: #7c6f88;
+  font-size: 14px;
+  background:
+    radial-gradient(circle at 50% 40%, rgba(123, 63, 175, .08), transparent 38%),
+    rgba(255,255,255,.76);
+  border: 1px solid rgba(105, 72, 184, .1);
+  border-radius: 22px;
+}
+
+.lazy-module-placeholder {
+  min-height: 360px;
+}
+
 .three-gem-canvas {
   width: 100%;
   height: 280px;
@@ -3731,6 +3750,10 @@ footer p { font-size: 15px; }
   .workspace .media-panel > img,
   .workspace .reference-panel.has-result > img,
   .workspace .query-panel.has-query > img { padding: 62px 12px 12px; }
+  .workspace .reference-panel .panel-head,
+  .workspace .query-panel .panel-head { height: 64px; padding: 0 14px; }
+  .workspace .reference-panel .panel-head span,
+  .workspace .query-panel .panel-head span { padding: 8px 11px; font-size: 13px; }
   .steps article { min-height: 220px; }
   .login-nudge { right: 16px; bottom: 16px; grid-template-columns: auto 1fr auto; }
   .login-nudge > button:not(.nudge-close) { grid-column: 2; justify-self: start; }
@@ -4322,6 +4345,51 @@ main {
 .workspace .query-panel .upload-zone p { margin: 21px 0 6px; color: #c4ccc9; font-family: inherit; font-size: 13px; font-weight: 400; line-height: 1.5; }
 .workspace .reference-panel .empty-panel small,
 .workspace .query-panel .upload-guidance small { color: #65736d; font-family: inherit; font-size: 10px; font-weight: 400; line-height: 1.55; }
+.workspace .reference-panel .panel-head,
+.workspace .query-panel .panel-head {
+  /* 优化：强化识别区“参考样本 / 用户实物”的标签辨识度，避免标题被图片弱化。 */
+  height: 76px;
+  padding: 0 24px;
+  background: linear-gradient(180deg, rgba(33, 21, 43, .72), rgba(33, 21, 43, .34) 64%, transparent);
+}
+.workspace .reference-panel .panel-head span,
+.workspace .query-panel .panel-head span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 14px;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 900;
+  letter-spacing: .12em;
+  background:
+    linear-gradient(120deg, #342347, #6948b8);
+  border: 1px solid rgba(255,255,255,.34);
+  border-radius: 999px;
+  box-shadow: 0 12px 32px rgba(75, 48, 127, 0.18), inset 0 1px 0 rgba(255,255,255,.18);
+}
+.workspace .reference-panel .panel-head span::before {
+  content: "◇";
+  font-size: 14px;
+}
+.workspace .query-panel .panel-head span::before {
+  content: "●";
+  font-size: 11px;
+}
+.workspace .query-panel .panel-head span {
+  /* 优化：实物上传徽章底色与“选择图片”主按钮保持一致。 */
+  background: linear-gradient(120deg, #342347, #6948b8);
+}
+.workspace .query-panel .panel-head small {
+  padding: 7px 10px;
+  color: #6b3f9a;
+  font-size: 12px;
+  font-weight: 800;
+  background: rgba(255,255,255,.86);
+  border: 1px solid rgba(123,63,175,.12);
+  border-radius: 999px;
+  box-shadow: 0 8px 20px rgba(66,38,96,.08);
+}
 .upload-zone.guest-locked { cursor: pointer; }
 .upload-zone.guest-locked .upload-icon { background: #8a6db0; }
 /* 优化：不覆盖 ECharts 自己计算的画布坐标，避免地图整体向右下偏移。 */
@@ -4344,6 +4412,7 @@ main {
 .atlas-category-card { height: 100%; }
 .atlas-category-card > b { min-height: 66px; display: flex; align-items: flex-end; }
 .atlas-category-card > small { min-height: 42px; line-height: 1.6; }
+.atlas-load-more-button,
 .atlas-collapse-button {
   display: block;
   min-width: 170px;
@@ -4357,6 +4426,18 @@ main {
   border-radius: 999px;
   box-shadow: 0 12px 28px rgba(123,63,175,.22);
   cursor: pointer;
+}
+
+.atlas-load-more-button {
+  /* 优化：图鉴详情分页加载，每次追加 24 个，减少一次性渲染压力。 */
+  background: linear-gradient(135deg, #f7f0fb, #fff);
+  color: #6b3b9c;
+  border: 1px solid rgba(123,63,175,.18);
+  box-shadow: 0 12px 28px rgba(123,63,175,.1);
+}
+
+.atlas-load-more-button + .atlas-collapse-button {
+  margin-top: 14px;
 }
 .birthstone-month-grid > button > span {
   padding: 6px 12px;

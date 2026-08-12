@@ -15,11 +15,7 @@ import {
   type StoneMatch,
   type StoneRecognitionResult,
 } from "./stoneRecognition";
-import GemKnowledgeQA from "./GemKnowledgeQA";
-import GemOriginMiniMap from "./GemOriginMiniMap";
 import MembershipView from "./MembershipView";
-import StoneAtlas from "./StoneAtlas";
-import BirthstoneStories from "./BirthstoneStories";
 import JewelryDesignCarousel from "./JewelryDesignCarousel";
 import PwaInstallPrompt from "./PwaInstallPrompt";
 import { sitePath } from "./sitePath";
@@ -42,6 +38,27 @@ const GemModel3D = dynamic(() => import("./GemModel3D"), {
       <small>正在加载 3D 宝石</small>
     </div>
   ),
+});
+
+/* 优化：地图、AI 问答、图鉴和生辰石拆分为按需加载模块，减少首页首屏 JS 压力。 */
+const GemOriginMiniMap = dynamic(() => import("./GemOriginMiniMap"), {
+  ssr: false,
+  loading: () => <div className="lazy-module-placeholder">正在加载产地地图…</div>,
+});
+
+const GemKnowledgeQA = dynamic(() => import("./GemKnowledgeQA"), {
+  ssr: false,
+  loading: () => <div className="lazy-module-placeholder">正在加载 AI 问答…</div>,
+});
+
+const StoneAtlas = dynamic(() => import("./StoneAtlas"), {
+  ssr: false,
+  loading: () => <section className="atlas-section"><div className="lazy-section-placeholder">正在加载石种图鉴…</div></section>,
+});
+
+const BirthstoneStories = dynamic(() => import("./BirthstoneStories"), {
+  ssr: false,
+  loading: () => <section className="birthstone-stories"><div className="lazy-section-placeholder">正在加载生辰石趣闻…</div></section>,
 });
 
 type Stage = "idle" | "ready" | "analyzing" | "result";
@@ -644,7 +661,7 @@ export default function Home() {
 
               <div className={`media-panel query-panel ${queryImage ? "has-query" : ""}`}>
                 <div className="panel-head">
-                  <span>用户实物</span>
+                  <span>实物上传</span>
                   {queryImage && stage !== "idle" && <small>图片预览</small>}
                 </div>
                 {queryImage ? (

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   bilingualCountryName,
   chineseNameForStone,
@@ -59,8 +59,30 @@ export default function StoneAtlas() {
   const [activeDomain, setActiveDomain] = useState<StoneDomain | null>(null);
   /* 优化：展开图鉴后支持按中英文快速搜索，方便在 106 个类别中定位石种。 */
   const [atlasQuery, setAtlasQuery] = useState("");
+  /* 优化：图鉴数据滚动到模块附近才加载，避免首页首屏立刻请求 106 类元数据。 */
+  const [atlasVisible, setAtlasVisible] = useState(false);
+  /* 优化：图鉴详情分页渲染，每次最多显示 24 个，降低一次性渲染压力。 */
+  const [visibleLimit, setVisibleLimit] = useState(24);
+  const atlasRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
+    const section = atlasRef.current;
+    if (!section) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setAtlasVisible(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "420px 0px" },
+    );
+    observer.observe(section);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!atlasVisible) return;
     loadGalleryMetadata()
       .then((metadata) => {
         const next = Object.entries(metadata.references).map(([key, images]) => {
@@ -76,7 +98,7 @@ export default function StoneAtlas() {
         setItems(next);
       })
       .catch(() => setItems([]));
-  }, []);
+  }, [atlasVisible]);
 
   const visibleItems = useMemo(
     () => activeDomain ? items.filter((item) => item.domain === activeDomain) : [],
@@ -91,7 +113,15 @@ export default function StoneAtlas() {
       return chinese.includes(query) || english.includes(query);
     });
   }, [atlasQuery, visibleItems]);
+  const displayedItems = useMemo(
+    () => filteredItems.slice(0, visibleLimit),
+    [filteredItems, visibleLimit],
+  );
   const activeCategory = categories.find((category) => category.domain === activeDomain);
+
+  useEffect(() => {
+    setVisibleLimit(24);
+  }, [activeDomain, atlasQuery]);
 
   /* 优化：详情底部也可一键收起，并平滑回到图鉴标题。 */
   const collapseAtlas = () => {
@@ -100,7 +130,7 @@ export default function StoneAtlas() {
   };
 
   return (
-    <section className="atlas-section" id="atlas">
+    <section className="atlas-section" id="atlas" ref={atlasRef}>
       <div className="atlas-heading">
         <div>
           <span className="eyebrow">STONE ATLAS</span>
@@ -117,6 +147,7 @@ export default function StoneAtlas() {
             key={category.domain}
             onClick={() => {
               setAtlasQuery("");
+              setVisibleLimit(24);
               setActiveDomain((current) => current === category.domain ? null : category.domain);
             }}
             aria-expanded={activeDomain === category.domain}
@@ -149,7 +180,7 @@ export default function StoneAtlas() {
             {atlasQuery && <button type="button" onClick={() => setAtlasQuery("")}>清除</button>}
           </div>
           <div className="atlas-stone-grid">
-            {filteredItems.map((item) => (
+            {displayedItems.map((item) => (
               <article key={`${item.domain}-${item.className}`}>
                 <img src={item.image} alt={`${chineseNameForStone(item.className)} ${item.className}`} loading="lazy" decoding="async" />
                 <div><b>{chineseNameForStone(item.className)}</b><small>{item.className}</small></div>
@@ -174,6 +205,11 @@ export default function StoneAtlas() {
               <b>没有找到对应石种</b>
               <p>可以尝试输入更短的关键词，例如 Ruby、Quartz、玉、岩石。</p>
             </div>
+          )}
+          {displayedItems.length < filteredItems.length && (
+            <button className="atlas-load-more-button" onClick={() => setVisibleLimit((current) => current + 24)}>
+              加载更多 · {displayedItems.length} / {filteredItems.length}
+            </button>
           )}
           {/* 优化 */}
           <button className="atlas-collapse-button" onClick={collapseAtlas}>收起详情 ↑</button>
