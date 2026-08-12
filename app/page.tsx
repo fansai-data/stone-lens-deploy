@@ -194,6 +194,17 @@ export default function Home() {
   const [loginError, setLoginError] = useState("");
   const [history, setHistory] = useState<HistoryEntry[]>([]);
   const [showBackTop, setShowBackTop] = useState(false);
+  /* 优化：移动端顶部导航改为折叠菜单，避免功能入口在小屏幕拥挤。 */
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  /* 优化：石种图鉴与生辰石故事滚动到附近再加载，减轻首页首屏 JS 压力。 */
+  const [shouldLoadAtlas, setShouldLoadAtlas] = useState(
+    () => typeof window !== "undefined" && window.location.hash === "#atlas",
+  );
+  const [shouldLoadBirthstones, setShouldLoadBirthstones] = useState(
+    () => typeof window !== "undefined" && window.location.hash === "#birthstones",
+  );
+  const atlasLazyRef = useRef<HTMLElement>(null);
+  const birthstonesLazyRef = useRef<HTMLElement>(null);
   const fileInput = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -245,6 +256,31 @@ export default function Home() {
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    const lazyTargets: Array<{
+      node: HTMLElement | null;
+      load: () => void;
+    }> = [
+      { node: atlasLazyRef.current, load: () => setShouldLoadAtlas(true) },
+      { node: birthstonesLazyRef.current, load: () => setShouldLoadBirthstones(true) },
+    ];
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          const target = lazyTargets.find((item) => item.node === entry.target);
+          target?.load();
+          observer.unobserve(entry.target);
+        });
+      },
+      { rootMargin: "520px 0px" },
+    );
+    lazyTargets.forEach((target) => {
+      if (target.node) observer.observe(target.node);
+    });
+    return () => observer.disconnect();
   }, []);
 
   useEffect(() => {
@@ -529,6 +565,20 @@ export default function Home() {
           <a href="#birthstones">生辰石趣闻</a>
           <a href="#history">历史记录</a>
         </nav>
+        <button
+          className={`mobile-menu-button ${mobileMenuOpen ? "active" : ""}`}
+          type="button"
+          onClick={() => setMobileMenuOpen((open) => !open)}
+          aria-expanded={mobileMenuOpen}
+          aria-controls="mobile-nav-panel"
+        >
+          <span className="mobile-menu-icon" aria-hidden="true">
+            <i />
+            <i />
+            <i />
+          </span>
+          <span className="mobile-menu-label">菜单</span>
+        </button>
         <div className="header-actions">
           <button className="login-button" onClick={() => setShowLogin(true)}>
             {/* 优化 */}
@@ -538,6 +588,13 @@ export default function Home() {
           </button>
           {/* 优化：会员开通后不再重复显示购买入口。 */}
           {!isMember && <button className="account-button" onClick={openMembership}>开通会员</button>}
+        </div>
+        <div className={`mobile-nav-panel ${mobileMenuOpen ? "open" : ""}`} id="mobile-nav-panel">
+          <a href="#identify" onClick={() => setMobileMenuOpen(false)}>识别宝石</a>
+          <a href="#atlas" onClick={() => setMobileMenuOpen(false)}>石种图鉴</a>
+          <a href="#birthstones" onClick={() => setMobileMenuOpen(false)}>生辰石趣闻</a>
+          <a href="#history" onClick={() => setMobileMenuOpen(false)}>历史记录</a>
+          {!isMember && <button onClick={() => { setMobileMenuOpen(false); openMembership(); }}>开通会员</button>}
         </div>
       </header>
 
@@ -670,9 +727,9 @@ export default function Home() {
                   <button className={`upload-zone ${!currentUser ? "guest-locked" : ""}`} onClick={requestImageSelection}>
                     <span className="upload-icon">＋</span>
                     {/* 优化：与参考样本空状态使用一致的提示文字层级。 */}
-                    <p>{currentUser ? "上传一张石头照片" : "登录后上传识别"}</p>
+                    <p>{currentUser ? "拍照或上传图片" : "登录后上传识别"}</p>
                     <div className="upload-guidance">
-                      <small>支持 JPG、PNG、WEBP · 上传前不会开始识别</small>
+                      <small>手机可拍照或从相册选择 · 支持 JPG、PNG、WEBP</small>
                       <small>请尽量上传背景干净、石头主体清晰的照片</small>
                     </div>
                   </button>
@@ -684,7 +741,7 @@ export default function Home() {
                 <input
                   ref={fileInput}
                   type="file"
-                  accept="image/jpeg,image/png,image/webp"
+                  accept="image/*"
                   onChange={handleFile}
                   disabled={!currentUser}
                   hidden
@@ -862,8 +919,20 @@ export default function Home() {
         )}
       </section>
 
-      <StoneAtlas />
-      <BirthstoneStories />
+      {shouldLoadAtlas ? (
+        <StoneAtlas />
+      ) : (
+        <section className="atlas-section lazy-section-shell" id="atlas" ref={atlasLazyRef}>
+          <div className="lazy-section-placeholder">石种图鉴靠近视窗后加载，首页更轻快…</div>
+        </section>
+      )}
+      {shouldLoadBirthstones ? (
+        <BirthstoneStories />
+      ) : (
+        <section className="birthstone-stories lazy-section-shell" id="birthstones" ref={birthstonesLazyRef}>
+          <div className="lazy-section-placeholder">生辰石趣闻靠近视窗后加载，滚动时自动出现…</div>
+        </section>
+      )}
 
       <footer>
         <div className="brand footer-brand">
