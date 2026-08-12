@@ -119,10 +119,6 @@ export default function StoneAtlas() {
   );
   const activeCategory = categories.find((category) => category.domain === activeDomain);
 
-  useEffect(() => {
-    setVisibleLimit(24);
-  }, [activeDomain, atlasQuery]);
-
   /* 优化：详情底部也可一键收起，并平滑回到图鉴标题。 */
   const collapseAtlas = () => {
     setActiveDomain(null);
@@ -173,11 +169,15 @@ export default function StoneAtlas() {
               <span>快速查找 · QUICK SEARCH</span>
               <input
                 value={atlasQuery}
-                onChange={(event) => setAtlasQuery(event.target.value)}
+                onChange={(event) => {
+                  /* 优化：搜索词变化时回到首批 24 个，避免上一次“加载更多”造成瞬时渲染过多。 */
+                  setVisibleLimit(24);
+                  setAtlasQuery(event.target.value);
+                }}
                 placeholder="输入中文或英文，例如：红宝石 / Ruby / Quartz"
               />
             </label>
-            {atlasQuery && <button type="button" onClick={() => setAtlasQuery("")}>清除</button>}
+            {atlasQuery && <button type="button" onClick={() => { setVisibleLimit(24); setAtlasQuery(""); }}>清除</button>}
           </div>
           <div className="atlas-stone-grid">
             {displayedItems.map((item) => (

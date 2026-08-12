@@ -276,51 +276,6 @@ export default function GemModel3D({
       return mesh;
     };
 
-    /* 优化：宝石恢复统一、完整的六棱切面造型。 */
-    const createHexagonalGem = () => {
-      const segments = 6;
-      const vertices: number[] = [];
-      const indices: number[] = [];
-      const pushRing = (radius: number, y: number, phase = Math.PI / 6) => {
-        const start = vertices.length / 3;
-        for (let index = 0; index < segments; index += 1) {
-          const angle = phase + (index / segments) * Math.PI * 2;
-          vertices.push(Math.cos(angle) * radius, y, Math.sin(angle) * radius);
-        }
-        return start;
-      };
-      const table = pushRing(0.52, 0.76);
-      const crown = pushRing(1.06, 0.1);
-      const girdle = pushRing(1.06, -0.06);
-      const topCenter = vertices.length / 3;
-      vertices.push(0, 0.76, 0);
-      const pavilion = vertices.length / 3;
-      vertices.push(0, -1.28, 0);
-      for (let index = 0; index < segments; index += 1) {
-        const next = (index + 1) % segments;
-        indices.push(topCenter, table + next, table + index);
-        indices.push(table + index, table + next, crown + next, table + index, crown + next, crown + index);
-        indices.push(crown + index, crown + next, girdle + next, crown + index, girdle + next, girdle + index);
-        indices.push(girdle + index, girdle + next, pavilion);
-      }
-      const geometry = new THREE.BufferGeometry();
-      geometry.setAttribute("position", new THREE.Float32BufferAttribute(vertices, 3));
-      geometry.setIndex(indices);
-      geometry.computeVertexNormals();
-      const material = gemMaterial.clone();
-      material.roughness = 0.07;
-      material.transmission = 0.46;
-      material.transparent = true;
-      material.opacity = 0.95;
-      material.thickness = 1.6;
-      material.clearcoat = 1;
-      material.clearcoatRoughness = 0.025;
-      material.side = THREE.FrontSide;
-      const mesh = new THREE.Mesh(geometry, material);
-      mesh.add(new THREE.LineSegments(new THREE.EdgesGeometry(geometry, 12), edgeMaterial));
-      return mesh;
-    };
-
     /* 优化：玉石使用由上下两个三角锥闭合组成的双三角锥模型。 */
     const createJadeBipyramid = () => {
       const vertices: number[] = [0, 1.32, 0, 0, -1.32, 0];
