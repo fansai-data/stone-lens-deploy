@@ -4619,6 +4619,35 @@ main {
 /* 优化：上传后手动框选石头区域，桌面与移动端保持清晰、易触控。 */
 .query-panel.has-query { position: relative; }
 .recrop-button { position: absolute; right: 18px; bottom: 18px; z-index: 4; min-height: 40px; padding: 9px 16px; color: #fff; font: 700 14px/1 inherit; background: rgba(35,20,50,.84); border: 1px solid rgba(255,255,255,.32); border-radius: 999px; box-shadow: 0 8px 22px rgba(20,10,30,.24); backdrop-filter: blur(8px); cursor: pointer; }
+/* 优化：图片上传/框选完成后的框内识别按钮仅用于移动端，宽屏仍使用下方操作栏。 */
+.inline-recognize-button {
+  display: none;
+  position: absolute;
+  z-index: 5;
+  right: 18px;
+  bottom: 18px;
+  left: 18px;
+  place-items: center;
+  gap: 4px;
+  min-height: 58px;
+  padding: 11px 18px;
+  color: #fff;
+  font: 900 16px/1.1 inherit;
+  letter-spacing: .04em;
+  background:
+    radial-gradient(circle at 18% 0%, rgba(255,255,255,.28), transparent 34%),
+    linear-gradient(135deg, #9f61dc, #6230a0);
+  border: 1px solid rgba(255,255,255,.28);
+  border-radius: 18px;
+  box-shadow: 0 18px 38px rgba(81,45,128,.3);
+  cursor: pointer;
+  backdrop-filter: blur(12px);
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+.inline-recognize-button:hover { transform: translateY(-2px); box-shadow: 0 22px 46px rgba(81,45,128,.35); }
+.inline-recognize-button span:not(.spinner) { color: rgba(255,255,255,.76); font-size: 12px; font-weight: 700; letter-spacing: 0; }
+.inline-recognize-button.is-loading { cursor: wait; opacity: .92; }
+.recrop-button + .inline-recognize-button { right: 126px; }
 .cropper-backdrop { position: fixed; inset: 0; z-index: 250; display: grid; place-items: center; padding: 24px; background: rgba(12,8,18,.72); backdrop-filter: blur(12px); }
 .cropper-dialog { width: min(100%,1040px); max-height: calc(100dvh - 40px); overflow: auto; padding: 24px; background: #fff; border: 1px solid rgba(123,63,175,.16); border-radius: 24px; box-shadow: 0 28px 80px rgba(12,7,20,.35); }
 .cropper-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; margin-bottom: 18px; }
@@ -4714,6 +4743,58 @@ main {
   .cropper-actions > div { width: 100%; }
   .cropper-actions .primary-button, .cropper-actions .secondary-button { flex: 1; min-width: 0; }
   .cropper-text-button { min-height: 38px; }
+  /* 优化：手机端实物图框内的识别按钮占主要操作位，重新框选保留为次操作。 */
+  .inline-recognize-button {
+    display: grid;
+    right: 14px;
+    bottom: 14px;
+    left: 14px;
+    min-height: 52px;
+    padding: 10px 16px;
+    overflow: hidden;
+    font-size: 15px;
+    border-radius: 999px;
+    background:
+      linear-gradient(135deg, rgba(255,255,255,.18), transparent 36%),
+      linear-gradient(135deg, rgba(123,63,175,.95), rgba(78,45,133,.95));
+    box-shadow: 0 14px 32px rgba(67, 39, 108, .26);
+  }
+  .inline-recognize-button::after {
+    position: absolute;
+    inset: 0;
+    content: "";
+    background: linear-gradient(105deg, transparent 0%, rgba(255,255,255,.26) 45%, transparent 70%);
+    transform: translateX(-120%);
+    animation: inline-action-sheen 2.8s ease-in-out infinite;
+    pointer-events: none;
+  }
+  .inline-recognize-button span:not(.spinner) {
+    font-size: 11px;
+  }
+  .recrop-button + .inline-recognize-button {
+    left: 112px;
+    right: 14px;
+  }
+  .recrop-button {
+    right: auto;
+    bottom: 16px;
+    left: 14px;
+    min-height: 56px;
+    padding: 10px 14px;
+    border-radius: 18px;
+  }
+}
+
+@media (min-width: 621px) and (max-width: 720px) {
+  /* 优化：平板窄屏也按移动端处理，上传图框内显示近手操作按钮。 */
+  .inline-recognize-button {
+    display: grid;
+  }
+}
+
+@keyframes inline-action-sheen {
+  0%, 45% { transform: translateX(-120%); }
+  75%, 100% { transform: translateX(120%); }
 }
 
 /* 优化：手机端识别结果改成更清晰的竖向信息流，减少拥挤与误触。 */

@@ -738,6 +738,18 @@ export default function Home() {
                 {queryImage && querySource === "upload" && originalQueryImage && stage !== "analyzing" && (
                   <button type="button" className="recrop-button" onClick={() => setCropOpen(true)}>重新框选</button>
                 )}
+                {/* 优化：上传完成后在实物图框内直接显示开始识别按钮，移动端无需继续下翻寻找操作区。 */}
+                {queryImage && stage === "ready" && (
+                  <button type="button" className="inline-recognize-button" onClick={identify}>
+                    开始识别
+                    <span>检索最相似的 5 个参考样本</span>
+                  </button>
+                )}
+                {queryImage && stage === "analyzing" && (
+                  <button type="button" className="inline-recognize-button is-loading" disabled>
+                    <span className="spinner" /> 正在识别
+                  </button>
+                )}
                 <input
                   ref={fileInput}
                   type="file"
