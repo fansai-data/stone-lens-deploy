@@ -47,6 +47,8 @@ const ORACLE_POOL: OracleStone[] = [
   { name: "玛瑙", english: "Blue Lace Agate", tone: "节奏与安放", image: "/model/references/gemstone--Blue-Lace-Agate--1.webp", color: "#83a9c9" },
 ];
 
+const INITIAL_ORACLE_STONES = ORACLE_POOL.slice(0, 3);
+
 const ORACLE_QUESTION_EXAMPLES = [
   "我最近有点犹豫，想听一句提醒",
   "我想重新开始一件事，可以给我一点灵感吗",
@@ -67,8 +69,8 @@ function localFallback(stone: OracleStone, question: string): string {
 }
 
 export default function DivinationPage() {
-  const [stones, setStones] = useState<OracleStone[]>([]);
-  const [selected, setSelected] = useState<OracleStone | null>(null);
+  const [stones, setStones] = useState<OracleStone[]>(INITIAL_ORACLE_STONES);
+  const [selected, setSelected] = useState<OracleStone | null>(INITIAL_ORACLE_STONES[0] ?? null);
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
   const [shownAnswer, setShownAnswer] = useState("");
@@ -77,15 +79,9 @@ export default function DivinationPage() {
   const [isShuffling, setIsShuffling] = useState(false);
 
   useEffect(() => {
-    const initial = pickThree();
-    setStones(initial);
-    setSelected(initial[0] ?? null);
-  }, []);
-
-  useEffect(() => {
     if (!answer) {
-      setShownAnswer("");
-      return;
+      const clearTimer = window.setTimeout(() => setShownAnswer(""), 0);
+      return () => window.clearTimeout(clearTimer);
     }
     let index = 0;
     const timer = window.setInterval(() => {
