@@ -50,10 +50,10 @@ const ORACLE_POOL: OracleStone[] = [
 const INITIAL_ORACLE_STONES = ORACLE_POOL.slice(0, 3);
 
 const ORACLE_QUESTION_EXAMPLES = [
-  "我最近有点犹豫，想听一句提醒",
-  "我想重新开始一件事，可以给我一点灵感吗",
-  "我现在需要更勇敢还是更安静",
-  "今天适合把注意力放在哪里",
+  "今天有点累，想听一句轻一点的话",
+  "最近想开始新计划，可以给我一点灵感吗",
+  "我想整理一下自己的状态",
+  "给我一句适合今天的提醒",
 ];
 
 function pickThree(): OracleStone[] {
@@ -153,7 +153,7 @@ export default function DivinationPage() {
       <section className="oracle-hero">
         <span className="eyebrow">STONE INSPIRATION</span>
         <h1>石之启示</h1>
-        <p>选一颗与你此刻心境相连的石头，让它给你一句轻轻的提醒。这里不是预测未来，而是把石头的颜色、名字与气质，变成一段可收藏的灵感。</p>
+        <p>选一颗顺眼的石头，获得一句今日灵感。这里不是预测未来，而是把石头的颜色、名字与气质，变成一段轻轻的提醒。</p>
       </section>
 
       <section className="oracle-card" aria-label="石之启示互动区">
@@ -194,6 +194,7 @@ export default function DivinationPage() {
               <span>{stone.name}</span>
               <small>{stone.english}</small>
               <b>{stone.tone}</b>
+              {selected?.english === stone.english && <em>已选择</em>}
             </button>
           ))}
         </div>
@@ -234,6 +235,13 @@ export default function DivinationPage() {
           <p className={shownAnswer ? "is-visible" : ""}>
             {shownAnswer || "选择石头后点击按钮，这里会逐字浮现它给你的启发。"}
           </p>
+          <div className="oracle-result-actions">
+            <button type="button" onClick={askOracle} disabled={!selected || loading}>
+              {loading ? "生成中…" : "再来一句"}
+            </button>
+            <a href={sitePath("/#identify")}>返回识别宝石</a>
+          </div>
+          <small className="oracle-disclaimer">内容仅作灵感参考，不作为决策建议。</small>
         </div>
       </section>
     </main>

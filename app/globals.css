@@ -5071,7 +5071,8 @@ main {
 
 .oracle-stone-card span,
 .oracle-stone-card small,
-.oracle-stone-card b {
+.oracle-stone-card b,
+.oracle-stone-card em {
   position: absolute;
   z-index: 3;
   left: 22px;
@@ -5101,6 +5102,24 @@ main {
   background: rgba(255,255,255,.18);
   color: #fff;
   font-size: 12px;
+  backdrop-filter: blur(10px);
+}
+
+.oracle-stone-card em {
+  top: 18px;
+  right: auto;
+  left: 18px;
+  width: fit-content;
+  padding: 7px 11px;
+  border: 1px solid rgba(255,255,255,.34);
+  border-radius: 999px;
+  background: rgba(255,255,255,.22);
+  color: #fff;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 900;
+  letter-spacing: .02em;
+  box-shadow: 0 10px 24px rgba(22,12,30,.12);
   backdrop-filter: blur(10px);
 }
 
@@ -5235,6 +5254,56 @@ main {
   line-height: 1.9;
 }
 
+.oracle-result-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 24px;
+  padding-top: 4px;
+}
+
+.oracle-result-actions button,
+.oracle-result-actions a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 0 15px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.oracle-result-actions button {
+  border: 0;
+  background: linear-gradient(135deg, #7b3faf, #a76ad5);
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 12px 26px rgba(123,63,175,.20);
+}
+
+.oracle-result-actions button:disabled {
+  cursor: not-allowed;
+  opacity: .62;
+}
+
+.oracle-result-actions a {
+  border: 1px solid rgba(123,63,175,.14);
+  background: rgba(255,255,255,.72);
+  color: #70459b;
+}
+
+.oracle-disclaimer {
+  display: block;
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(123, 63, 175, .08);
+  color: #9b8fa5;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
 .oracle-result p.is-visible::after {
   display: inline-block;
   width: 8px;
@@ -5278,19 +5347,7 @@ main {
   }
 
   .oracle-card-diamond {
-    position: relative;
-    top: auto;
-    right: auto;
-    width: 96px;
-    height: 80px;
-    margin: 0;
-  }
-
-  .oracle-card-diamond .three-gem,
-  .oracle-card-diamond .three-gem-canvas,
-  .oracle-card-diamond .three-gem.compact .three-gem-canvas {
-    min-height: 80px;
-    height: 80px;
+    display: none;
   }
 
   .oracle-card-head,
@@ -5301,7 +5358,7 @@ main {
   .oracle-card-head {
     display: grid;
     align-items: center;
-    grid-template-columns: minmax(0, 1fr) 96px;
+    grid-template-columns: 1fr;
     padding-right: 0;
   }
 
@@ -5311,6 +5368,18 @@ main {
 
   .oracle-refresh,
   .oracle-submit {
+    width: 100%;
+  }
+
+  .oracle-result-actions {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 9px;
+    margin-top: 22px;
+  }
+
+  .oracle-result-actions button,
+  .oracle-result-actions a {
     width: 100%;
   }
 
