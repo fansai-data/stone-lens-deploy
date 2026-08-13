@@ -63,9 +63,9 @@ function pickThree(): OracleStone[] {
 
 function localFallback(stone: OracleStone, question: string): string {
   const suffix = question.trim()
-    ? "答案不必急着被命名，先把真正重要的感受留下，再决定下一步。"
-    : "此刻可以慢一点，把注意力收回自己手里，再向真正想去的方向靠近。";
-  return `什么石头提示您：${stone.name}把${stone.tone}放在掌心，提醒您不必被一时的杂音推着走。${suffix}`;
+    ? "先把问题拆成一个今天能完成的小动作，比如写下最担心的一点，再写下最想保留的一点。答案不必立刻被命名，清晰会在行动里慢慢出现。"
+    : "今天可以先给自己留出十分钟安静时间，整理一件最容易开始的小事。不是逼自己马上改变，而是把注意力重新收回到可掌控的地方。";
+  return `${stone.name}把${stone.tone}放在掌心，像一束不急不躁的光，提醒您先看见此刻真正牵动自己的部分。${suffix}`;
 }
 
 export default function DivinationPage() {

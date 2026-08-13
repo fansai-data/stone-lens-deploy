@@ -12,8 +12,8 @@ type GemChatPayload = {
 
 function keepCompleteAnswer(value: string, mode: GemChatMode): string {
   const answer = value.trim().replace(/\n{3,}/g, "\n\n");
-  const maxLength = mode === "revelation" ? 96 : 180;
-  const minLength = mode === "revelation" ? 52 : 100;
+  const maxLength = mode === "revelation" ? 132 : 180;
+  const minLength = mode === "revelation" ? 88 : 100;
   if (answer.length <= maxLength) return answer;
 
   const sentenceEnds: number[] = [];
@@ -40,9 +40,7 @@ function allowRequest(id: string): boolean {
 }
 
 function normalizeRevelationAnswer(answer: string): string {
-  const prefix = "什么石头提示您：";
-  if (answer.startsWith(prefix)) return answer;
-  return `${prefix}${answer.replace(/^什么石头[：:，, ]?/, "").trim()}`;
+  return answer.replace(/^什么石头提示您[：:，, ]?/, "").trim();
 }
 
 export async function POST(request: Request) {
@@ -73,7 +71,7 @@ export async function POST(request: Request) {
 
   const systemPrompt =
     mode === "revelation"
-      ? "你是一个温和的石头启发助手。用户会告诉你ta选了一颗石头，并问了一个问题。你的任务是基于这颗石头的名字和用户的提问，写一段约60-80字的启发式文字。必须用“什么石头提示您：”开头；不预测未来，不涉及吉凶、财运、桃花、命运；只做温和叙述，像朋友分享想法；不重复用户的问题；不解释石头物理属性，只做文学化联想；如果问题涉及重大决策，温和提醒用户自己才是决定者。"
+      ? "你是“石相 StoneLens”的石头启发助手，语气温和、有画面感，但不要空泛。用户会选择一颗石头，并可提出一个问题。请用简体中文写一段约95-120字的启发文字。自然开头即可，不要使用“什么石头提示您”这类固定前缀。内容需包含三层：1）结合石头名称产生一个具体意象；2）回应用户此刻的问题或状态；3）给出一个今天就能做的小行动建议。不要预测未来，不谈吉凶、财运、桃花、命运，不使用“注定”“一定会”等绝对词；不解释矿物物理属性；如果问题涉及重大决策，提醒用户最终决定仍在自己手中。"
       : "你是专业、亲切的宝石学知识助手。围绕给定的匹配类别，用简体中文正面回答用户的具体问题；除非用户询问鉴定，否则不要复述视觉识别原理。正文必须控制在100到180个汉字之间，优先用1到2个短段落；不要写标题、列表、开场白或结尾客套话。必须把最后一句写完整，禁止用省略号表示截断。明确区分视觉匹配与专业鉴定；不确定时直接说明，不虚构产地、价格、功效或真伪结论。";
 
   const userPrompt =
@@ -95,7 +93,7 @@ export async function POST(request: Request) {
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt },
         ],
-        max_tokens: mode === "revelation" ? 150 : 260,
+        max_tokens: mode === "revelation" ? 220 : 260,
         stream: false,
       }),
     });
