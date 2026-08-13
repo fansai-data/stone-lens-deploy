@@ -197,12 +197,8 @@ export default function Home() {
   /* 优化：移动端顶部导航改为折叠菜单，避免功能入口在小屏幕拥挤。 */
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   /* 优化：石种图鉴与生辰石故事滚动到附近再加载，减轻首页首屏 JS 压力。 */
-  const [shouldLoadAtlas, setShouldLoadAtlas] = useState(
-    () => typeof window !== "undefined" && window.location.hash === "#atlas",
-  );
-  const [shouldLoadBirthstones, setShouldLoadBirthstones] = useState(
-    () => typeof window !== "undefined" && window.location.hash === "#birthstones",
-  );
+  const [shouldLoadAtlas, setShouldLoadAtlas] = useState(false);
+  const [shouldLoadBirthstones, setShouldLoadBirthstones] = useState(false);
   const atlasLazyRef = useRef<HTMLElement>(null);
   const birthstonesLazyRef = useRef<HTMLElement>(null);
   const fileInput = useRef<HTMLInputElement>(null);
@@ -284,7 +280,23 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    if ("serviceWorker" in navigator) {
+    /* 优化：避免根据 window.location.hash 直接生成首屏状态，修复服务端与客户端 HTML 不一致导致的 Hydration 报错。 */
+    const loadByHash = () => {
+      if (window.location.hash === "#atlas") setShouldLoadAtlas(true);
+      if (window.location.hash === "#birthstones") setShouldLoadBirthstones(true);
+    };
+    loadByHash();
+    window.addEventListener("hashchange", loadByHash);
+    return () => window.removeEventListener("hashchange", loadByHash);
+  }, []);
+
+  useEffect(() => {
+    /* 优化：本地开发时注销旧 service worker，避免 localhost 资源缓存导致页面反复闪烁；生产环境仍保留 PWA 缓存。 */
+    if ("serviceWorker" in navigator && process.env.NODE_ENV === "development") {
+      navigator.serviceWorker.getRegistrations()
+        .then((registrations) => registrations.forEach((registration) => registration.unregister()))
+        .catch(() => undefined);
+    } else if ("serviceWorker" in navigator) {
       navigator.serviceWorker.register(sitePath("/sw.js")).catch(() => undefined);
     }
     return () => {
@@ -563,6 +575,7 @@ export default function Home() {
           <a href="#identify">识别宝石</a>
           <a href="#atlas">石种图鉴</a>
           <a href="#birthstones">生辰石趣闻</a>
+          <a href={sitePath("/divination")}>石之启示</a>
           <a href="#history">历史记录</a>
         </nav>
         <button
@@ -593,6 +606,7 @@ export default function Home() {
           <a href="#identify" onClick={() => setMobileMenuOpen(false)}>识别宝石</a>
           <a href="#atlas" onClick={() => setMobileMenuOpen(false)}>石种图鉴</a>
           <a href="#birthstones" onClick={() => setMobileMenuOpen(false)}>生辰石趣闻</a>
+          <a href={sitePath("/divination")} onClick={() => setMobileMenuOpen(false)}>石之启示</a>
           <a href="#history" onClick={() => setMobileMenuOpen(false)}>历史记录</a>
           {!isMember && <button onClick={() => { setMobileMenuOpen(false); openMembership(); }}>开通会员</button>}
         </div>
@@ -834,6 +848,12 @@ export default function Home() {
               </div>
             </div>
 
+            {/* 优化：明确视觉匹配边界，避免用户把相似度误解为专业鉴定结论。 */}
+            <div className="match-context-note">
+              <b>结果说明</b>
+              <p>StoneLens 展示的是视觉相似结果，适合作为初步识别与收藏参考；最终材质、真伪和价值仍建议结合实物检测。</p>
+            </div>
+
             {recognizedProfile && (
               <section className="recognized-context" aria-label="识别类别三维模型与主要产地">
                 <div className="model-profile-panel">
@@ -877,6 +897,10 @@ export default function Home() {
                 <h3>Top‑5 相似结果</h3>
                 <span>点击任一结果，可切换上方参考样本、模型与产地</span>
               </div>
+              {/* 优化：解释 Top-5 出现的原因，降低用户看到相近类别时的困惑。 */}
+              <p className="top-match-explainer">
+                宝石颜色、切工、光照和背景都会影响视觉特征，因此系统展示最接近的 5 个类别，可进行交叉比较。
+              </p>
               <div className="match-grid">
                 {recognition.matches.map((match, index) => (
                   <button
@@ -1021,6 +1045,12 @@ export default function Home() {
             setRecognitionError(null);
             setStage("ready");
             setCropOpen(false);
+            /* 优化：移动端框选完成后自动定位到实物图与开始识别按钮附近，避免用户继续下翻寻找操作。 */
+            window.setTimeout(() => {
+              if (window.innerWidth <= 720) {
+                document.querySelector(".query-panel")?.scrollIntoView({ behavior: "smooth", block: "center" });
+              }
+            }, 160);
           }}
         />
       )}

@@ -13,6 +13,7 @@ export default function GemModel3D({
   stoneName = "",
   stoneDomain = "gemstone",
   showCutSwitch = true,
+  turntable = false,
   onInspect,
 }: {
   compact?: boolean;
@@ -22,6 +23,7 @@ export default function GemModel3D({
   stoneName?: string;
   stoneDomain?: "gemstone" | "jade_raw" | "common_rock";
   showCutSwitch?: boolean;
+  turntable?: boolean;
   onInspect?: () => void;
 }) {
   const mountRef = useRef<HTMLDivElement>(null);
@@ -38,7 +40,7 @@ export default function GemModel3D({
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 100);
-    camera.position.set(0, 0.05, compact ? 5.7 : 5.25);
+    camera.position.set(0, turntable ? 0.22 : 0.05, turntable ? 5.15 : compact ? 5.7 : 5.25);
 
     const renderer = new THREE.WebGLRenderer({
       alpha: true,
@@ -52,7 +54,8 @@ export default function GemModel3D({
     mount.appendChild(renderer.domElement);
 
     const group = new THREE.Group();
-    group.rotation.set(-0.16, 0.52, 0.04);
+    /* 优化：石之启示页使用展示台式横向转动，避免钻石看起来像在斜着翻滚。 */
+    group.rotation.set(turntable ? -0.62 : -0.16, turntable ? 0.22 : 0.52, turntable ? 0 : 0.04);
     scene.add(group);
 
     const gemMaterial = new THREE.MeshPhysicalMaterial({
@@ -370,7 +373,12 @@ export default function GemModel3D({
     const pointerMove = (event: PointerEvent) => {
       if (!dragging) return;
       group.rotation.y += (event.clientX - previousX) * 0.009;
-      group.rotation.x += (event.clientY - previousY) * 0.007;
+      if (turntable) {
+        const nextX = group.rotation.x + (event.clientY - previousY) * 0.0025;
+        group.rotation.x = Math.max(-0.86, Math.min(-0.38, nextX));
+      } else {
+        group.rotation.x += (event.clientY - previousY) * 0.007;
+      }
       previousX = event.clientX;
       previousY = event.clientY;
     };
@@ -389,7 +397,7 @@ export default function GemModel3D({
         lastCut = cutRef.current;
         swapModel(lastCut);
       }
-      if (!dragging) group.rotation.y += 0.0035;
+      if (!dragging) group.rotation.y += turntable ? 0.006 : 0.0035;
       renderer.render(scene, camera);
       frame = window.requestAnimationFrame(animate);
     };
@@ -412,7 +420,7 @@ export default function GemModel3D({
       renderer.dispose();
       renderer.domElement.remove();
     };
-  }, [color, compact, crystalSystem, initialCut, stoneDomain, stoneName]);
+  }, [color, compact, crystalSystem, initialCut, stoneDomain, stoneName, turntable]);
 
   return (
     <div className={`three-gem ${compact ? "compact" : ""}`}>
