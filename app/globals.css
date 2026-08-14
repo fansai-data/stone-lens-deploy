@@ -2361,11 +2361,11 @@ footer p,
 }
 
 .recognized-model-card .three-gem {
-  min-height: 325px;
+  min-height: 355px;
 }
 
 .recognized-model-card .three-gem-canvas {
-  height: 255px;
+  height: 292px;
 }
 
 .inspect-gem {
@@ -2471,7 +2471,7 @@ footer p,
   }
 
   .recognized-model-card .three-gem-canvas {
-    height: 225px;
+    height: 248px;
   }
 
   .gem-info-grid {
@@ -2732,7 +2732,7 @@ footer p,
 }
 
 .recognized-model-card .three-gem-canvas {
-  height: 290px;
+  height: 334px;
 }
 
 @media (max-width: 920px) {
@@ -3309,15 +3309,15 @@ footer p { font-size: 15px; }
   position: relative;
   display: grid;
   place-items: center;
-  min-height: 430px;
-  padding: 20px 122px 12px;
+  min-height: 482px;
+  padding: 22px 124px 14px;
   background:
     radial-gradient(circle at 50% 47%, rgba(130, 92, 199, 0.13), transparent 34%),
     linear-gradient(145deg, #fdfcfe, #f5f1f8);
 }
 
-.annotated-model .three-gem { width: 100%; min-height: 390px; }
-.annotated-model .three-gem-canvas { height: 330px; }
+.annotated-model .three-gem { width: 100%; min-height: 448px; }
+.annotated-model .three-gem-canvas { height: 382px; }
 .annotated-model .drag-hint { font-size: 12px; }
 
 .model-annotation {
@@ -3512,7 +3512,9 @@ footer p { font-size: 15px; }
   .result-summary { align-items: flex-start; flex-direction: column; gap: 22px; padding: 26px; }
   .result-fact-strip { grid-template-columns: 1fr; width: 100%; }
   .similarity { align-items: flex-start; width: 100%; padding: 18px 0 0; border-top: 1px solid var(--line); border-left: 0; }
-  .annotated-model { padding: 86px 18px 80px; }
+  .annotated-model { min-height: 392px; padding: 86px 18px 80px; }
+  .annotated-model .three-gem { min-height: 360px; }
+  .annotated-model .three-gem-canvas { height: 302px; }
   .model-annotation { width: 160px; }
   .hardness-annotation { top: 16px; left: 18px; }
   .crystal-annotation { right: 18px; bottom: 16px; }
@@ -5518,7 +5520,7 @@ main {
   }
 
   .annotated-model {
-    min-height: 360px;
+    min-height: 392px;
   }
 
   .origin-profile-panel .gem-origin-map-shell {
