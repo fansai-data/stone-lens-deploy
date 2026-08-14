@@ -77,6 +77,15 @@ export default function DivinationPage() {
   const [loading, setLoading] = useState(false);
   const [notice, setNotice] = useState("");
   const [isShuffling, setIsShuffling] = useState(false);
+  const [isMember, setIsMember] = useState(false);
+
+  useEffect(() => {
+    /* 优化：石之启示作为会员专属功能，复用主站本地会员状态。 */
+    const username = window.localStorage.getItem("stonelens-current-user") || "";
+    const role = username === "admin" ? "admin" : username ? "user" : "guest";
+    const memberActive = username ? window.localStorage.getItem(`stonelens-membership-active-${username}`) === "true" : false;
+    setIsMember(role === "admin" || memberActive);
+  }, []);
 
   useEffect(() => {
     if (!answer) {
@@ -112,6 +121,10 @@ export default function DivinationPage() {
 
   const askOracle = async () => {
     if (!selected || loading) return;
+    if (!isMember) {
+      setNotice("石之启示为会员专属，开通会员后即可使用 AI 灵感问答。");
+      return;
+    }
     setLoading(true);
     setAnswer("");
     setNotice("");
@@ -153,7 +166,7 @@ export default function DivinationPage() {
       <section className="oracle-hero">
         <span className="eyebrow">STONE INSPIRATION</span>
         <h1>石之启示</h1>
-        <p>选一颗顺眼的石头，获得一句今日灵感。这里不是预测未来，而是把石头的颜色、名字与气质，变成一段轻轻的提醒。</p>
+        <p>会员专属 · 选一颗顺眼的石头，获得一句今日灵感。</p>
       </section>
 
       <section className="oracle-card" aria-label="石之启示互动区">
@@ -177,71 +190,85 @@ export default function DivinationPage() {
           <button type="button" className="oracle-refresh" onClick={refreshStones}>🔄 换一组灵感石</button>
         </div>
 
-        <div className={`oracle-stone-grid ${isShuffling ? "is-shuffling" : ""}`}>
-          {stones.map((stone) => (
-            <button
-              type="button"
-              key={stone.english}
-              className={`oracle-stone-card ${selected?.english === stone.english ? "selected" : ""}`}
-              onClick={() => {
-                setSelected(stone);
-                setAnswer("");
-                setNotice("");
-              }}
-              style={{ "--stone-color": stone.color } as CSSProperties}
-            >
-              <img src={sitePath(stone.image)} alt={`${stone.name} ${stone.english}`} />
-              <span>{stone.name}</span>
-              <small>{stone.english}</small>
-              <b>{stone.tone}</b>
-              {selected?.english === stone.english && <em>已选择</em>}
-            </button>
-          ))}
-        </div>
+        {!isMember && (
+          <div className="oracle-member-gate">
+            <span>会员专属功能</span>
+            <p>开通会员后可使用 AI 生成石头灵感；当前页面仍可作为功能预览。</p>
+            <a href={sitePath("/#membership")}>开通会员</a>
+          </div>
+        )}
 
-        <div className="oracle-question-panel">
-          <label>
-            <span>📝 你想问什么？（选填）</span>
-            <div className="oracle-question-examples" aria-label="问题示例">
-              {ORACLE_QUESTION_EXAMPLES.map((example) => (
+        <div className="oracle-compact-layout">
+          <div className="oracle-left-panel">
+            <div className={`oracle-stone-grid ${isShuffling ? "is-shuffling" : ""}`}>
+              {stones.map((stone) => (
                 <button
                   type="button"
-                  key={example}
+                  key={stone.english}
+                  className={`oracle-stone-card ${selected?.english === stone.english ? "selected" : ""}`}
                   onClick={() => {
-                    setQuestion(example);
+                    setSelected(stone);
                     setAnswer("");
                     setNotice("");
                   }}
+                  style={{ "--stone-color": stone.color } as CSSProperties}
                 >
-                  {example}
+                  <img src={sitePath(stone.image)} alt={`${stone.name} ${stone.english}`} />
+                  <span>{stone.name}</span>
+                  <small>{stone.english}</small>
+                  <b>{stone.tone}</b>
+                  {selected?.english === stone.english && <em>已选择</em>}
                 </button>
               ))}
             </div>
-            <input
-              value={question}
-              maxLength={120}
-              onChange={(event) => setQuestion(event.target.value)}
-              placeholder="例如：我最近有点犹豫，想听一句提醒"
-            />
-          </label>
-          <button type="button" className="oracle-submit" onClick={askOracle} disabled={!selected || loading}>
-            {loading ? "正在聆听石头…" : "✨ 获得启示"}
-          </button>
-        </div>
 
-        <div className="oracle-result" aria-live="polite">
-          <span>{selectedLabel}</span>
-          {notice && <small>{notice}</small>}
-          <p className={shownAnswer ? "is-visible" : ""}>
-            {shownAnswer || "选择石头后点击按钮，这里会逐字浮现它给你的启发。"}
-          </p>
-          <div className="oracle-result-actions">
-            <button type="button" onClick={askOracle} disabled={!selected || loading}>
-              {loading ? "生成中…" : "再来一句"}
-            </button>
-            <a href={sitePath("/#identify")}>返回识别宝石</a>
+            <div className="oracle-question-panel">
+              <label>
+                <span>📝 你想问什么？（选填）</span>
+                <p className="oracle-input-guide">这里不是预测未来，而是把石头的颜色、名字与气质，变成一段轻轻的提醒。</p>
+                <div className="oracle-question-examples" aria-label="问题示例">
+                  {ORACLE_QUESTION_EXAMPLES.slice(0, 3).map((example) => (
+                    <button
+                      type="button"
+                      key={example}
+                      onClick={() => {
+                        setQuestion(example);
+                        setAnswer("");
+                        setNotice("");
+                      }}
+                    >
+                      {example}
+                    </button>
+                  ))}
+                </div>
+                <input
+                  value={question}
+                  maxLength={120}
+                  onChange={(event) => setQuestion(event.target.value)}
+                  placeholder="写一句你想问的话，或点上方示例"
+                  disabled={!isMember}
+                />
+              </label>
+              <button type="button" className="oracle-submit" onClick={askOracle} disabled={!isMember || !selected || loading}>
+                {loading ? "正在聆听石头…" : "✨ 获得启示"}
+              </button>
+            </div>
           </div>
-          <small className="oracle-disclaimer">内容仅作灵感参考，不作为决策建议。</small>
+
+          <div className="oracle-result" aria-live="polite">
+            <span>{selectedLabel}</span>
+            {notice && <small>{notice}</small>}
+            <p className={shownAnswer ? "is-visible" : ""}>
+              {shownAnswer || "选择石头后点击按钮，这里会逐字浮现它给你的启发。"}
+            </p>
+            <div className="oracle-result-actions">
+              <button type="button" onClick={askOracle} disabled={!isMember || !selected || loading}>
+                {loading ? "生成中…" : "再来一句"}
+              </button>
+              <a href={sitePath("/#identify")}>返回识别宝石</a>
+            </div>
+            <small className="oracle-disclaimer">内容仅作灵感参考，不作为决策建议。</small>
+          </div>
         </div>
       </section>
     </main>

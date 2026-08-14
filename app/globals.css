@@ -4780,7 +4780,7 @@ main {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: min(1120px, calc(100% - 36px));
+  width: min(1280px, calc(100% - 32px));
   margin: 18px auto 0;
   padding: 12px 14px;
   border: 1px solid rgba(123, 63, 175, .11);
@@ -4831,7 +4831,7 @@ main {
 }
 
 .oracle-hero {
-  width: min(920px, calc(100% - 36px));
+  width: min(1160px, calc(100% - 32px));
   margin: 78px auto 32px;
   text-align: center;
 }
@@ -4873,7 +4873,7 @@ main {
 
 .oracle-card {
   position: relative;
-  width: min(1060px, calc(100% - 36px));
+  width: min(1220px, calc(100% - 32px));
   margin: 0 auto 80px;
   padding: clamp(22px, 4vw, 42px);
   border: 1px solid rgba(123, 63, 175, .12);
@@ -5321,6 +5321,176 @@ main {
   50% { opacity: 0; }
 }
 
+/* 优化：石之启示改为会员专属的一屏紧凑布局，桌面端减少纵向滚动。 */
+.oracle-hero {
+  margin-top: 38px;
+  margin-bottom: 18px;
+}
+
+.oracle-hero h1 {
+  margin: 6px 0 8px;
+  font-size: clamp(44px, 6vw, 72px);
+}
+
+.oracle-hero p {
+  font-size: clamp(14px, 1.5vw, 16px);
+  line-height: 1.55;
+}
+
+.oracle-card {
+  margin-bottom: 40px;
+  padding: clamp(18px, 2.5vw, 28px);
+}
+
+.oracle-card-head {
+  margin-bottom: 14px;
+}
+
+.oracle-card-head h2 {
+  font-size: clamp(24px, 3vw, 34px);
+}
+
+.oracle-member-gate {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+  padding: 11px 14px;
+  border: 1px solid rgba(123, 63, 175, .13);
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(123,63,175,.075), rgba(255,255,255,.92));
+  color: #6a5f72;
+}
+
+.oracle-member-gate span {
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: rgba(123, 63, 175, .12);
+  color: #7145a4;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.oracle-member-gate p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.oracle-member-gate a {
+  min-height: 34px;
+  padding: 0 13px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #7b3faf, #a76ad5);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 900;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.oracle-compact-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(300px, .92fr);
+  gap: 18px;
+  align-items: stretch;
+}
+
+.oracle-left-panel {
+  display: grid;
+  gap: 14px;
+}
+
+.oracle-compact-layout .oracle-stone-grid {
+  gap: 12px;
+}
+
+.oracle-compact-layout .oracle-stone-card {
+  min-height: 210px;
+  border-radius: 22px;
+}
+
+.oracle-compact-layout .oracle-stone-card img {
+  min-height: 210px;
+}
+
+.oracle-compact-layout .oracle-stone-card span {
+  bottom: 70px;
+  font-size: 25px;
+}
+
+.oracle-compact-layout .oracle-stone-card small {
+  bottom: 48px;
+}
+
+.oracle-compact-layout .oracle-stone-card b {
+  bottom: 18px;
+  padding: 6px 10px;
+  font-size: 11px;
+}
+
+.oracle-compact-layout .oracle-question-panel {
+  grid-template-columns: 1fr;
+  gap: 10px;
+  margin-top: 0;
+  padding: 13px;
+}
+
+.oracle-input-guide {
+  margin: 0;
+  color: #999;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.oracle-compact-layout .oracle-question-examples {
+  gap: 7px;
+  margin: 0;
+}
+
+.oracle-compact-layout .oracle-question-examples button {
+  min-height: 28px;
+  padding: 0 10px;
+  font-size: 11px;
+}
+
+.oracle-compact-layout .oracle-question-panel input {
+  min-height: 44px;
+  font-size: 14px;
+}
+
+.oracle-compact-layout .oracle-submit {
+  align-self: auto;
+  min-height: 44px;
+}
+
+.oracle-compact-layout .oracle-result {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  margin-top: 0;
+  padding: clamp(18px, 2.4vw, 26px);
+}
+
+.oracle-compact-layout .oracle-result p {
+  flex: 1;
+  min-height: 150px;
+  font-size: clamp(18px, 1.8vw, 22px);
+  line-height: 1.82;
+}
+
+.oracle-compact-layout .oracle-result-actions {
+  margin-top: 18px;
+}
+
+.oracle-compact-layout .oracle-disclaimer {
+  margin-top: 12px;
+}
+
 @media (max-width: 760px) {
   .divination-nav {
     align-items: stretch;
@@ -5346,6 +5516,28 @@ main {
 
   .oracle-card {
     border-radius: 26px;
+  }
+
+  .oracle-member-gate {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+
+  .oracle-member-gate a {
+    width: 100%;
+  }
+
+  .oracle-compact-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .oracle-compact-layout .oracle-stone-card,
+  .oracle-compact-layout .oracle-stone-card img {
+    min-height: 230px;
+  }
+
+  .oracle-compact-layout .oracle-result p {
+    min-height: 110px;
   }
 
   .oracle-card-diamond {
