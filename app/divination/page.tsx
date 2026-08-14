@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import type { CSSProperties } from "react";
 import { sitePath } from "../sitePath";
 
@@ -56,6 +56,19 @@ const ORACLE_QUESTION_EXAMPLES = [
   "给我一句适合今天的提醒",
 ];
 
+function getOracleMemberSnapshot(): boolean {
+  if (typeof window === "undefined") return false;
+  const username = window.localStorage.getItem("stonelens-current-user") || "";
+  if (username === "admin") return true;
+  return Boolean(username && window.localStorage.getItem(`stonelens-membership-active-${username}`) === "true");
+}
+
+function subscribeOracleMemberStatus(callback: () => void): () => void {
+  if (typeof window === "undefined") return () => {};
+  window.addEventListener("storage", callback);
+  return () => window.removeEventListener("storage", callback);
+}
+
 function pickThree(): OracleStone[] {
   const shuffled = [...ORACLE_POOL].sort(() => Math.random() - 0.5);
   return shuffled.slice(0, 3);
@@ -77,15 +90,8 @@ export default function DivinationPage() {
   const [loading, setLoading] = useState(false);
   const [notice, setNotice] = useState("");
   const [isShuffling, setIsShuffling] = useState(false);
-  const [isMember, setIsMember] = useState(false);
-
-  useEffect(() => {
-    /* 优化：石之启示作为会员专属功能，复用主站本地会员状态。 */
-    const username = window.localStorage.getItem("stonelens-current-user") || "";
-    const role = username === "admin" ? "admin" : username ? "user" : "guest";
-    const memberActive = username ? window.localStorage.getItem(`stonelens-membership-active-${username}`) === "true" : false;
-    setIsMember(role === "admin" || memberActive);
-  }, []);
+  /* 优化：石之启示作为会员专属功能，复用主站本地会员状态，并避免 effect 内同步 setState 导致 CI lint 失败。 */
+  const isMember = useSyncExternalStore(subscribeOracleMemberStatus, getOracleMemberSnapshot, () => false);
 
   useEffect(() => {
     if (!answer) {
