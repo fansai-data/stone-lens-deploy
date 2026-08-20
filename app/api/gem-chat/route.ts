@@ -8,10 +8,21 @@ type GemChatPayload = {
   gemName?: string;
   question?: string;
   mode?: GemChatMode;
+  language?: "zh" | "en";
 };
 
-function keepCompleteAnswer(value: string, mode: GemChatMode): string {
+function keepCompleteAnswer(value: string, mode: GemChatMode, language: "zh" | "en"): string {
   const answer = value.trim().replace(/\n{3,}/g, "\n\n");
+  if (language === "en") {
+    const maxLength = mode === "revelation" ? 620 : 760;
+    if (answer.length <= maxLength) return answer;
+    const sentenceEnds: number[] = [];
+    for (let index = 0; index < Math.min(answer.length, maxLength); index += 1) {
+      if (/[.!?]/.test(answer[index])) sentenceEnds.push(index + 1);
+    }
+    const complete = sentenceEnds.at(-1);
+    return (complete ? answer.slice(0, complete) : answer.slice(0, maxLength)).trim();
+  }
   const maxLength = mode === "revelation" ? 132 : 180;
   const minLength = mode === "revelation" ? 88 : 100;
   if (answer.length <= maxLength) return answer;
@@ -57,6 +68,7 @@ export async function POST(request: Request) {
   }
 
   const mode: GemChatMode = payload.mode === "revelation" ? "revelation" : "knowledge";
+  const language = payload.language === "en" ? "en" : "zh";
   const gemName = payload.gemName?.trim().slice(0, 80) || "";
   const question = payload.question?.trim().slice(0, 300) || "";
 
@@ -71,13 +83,21 @@ export async function POST(request: Request) {
 
   const systemPrompt =
     mode === "revelation"
-      ? "你是“石相 StoneLens”的石头启发助手，语气温和、有画面感，但不要空泛。用户会选择一颗石头，并可提出一个问题。请用简体中文写一段约95-120字的启发文字。自然开头即可，不要使用“什么石头提示您”这类固定前缀。内容需包含三层：1）结合石头名称产生一个具体意象；2）回应用户此刻的问题或状态；3）给出一个今天就能做的小行动建议。不要预测未来，不谈吉凶、财运、桃花、命运，不使用“注定”“一定会”等绝对词；不解释矿物物理属性；如果问题涉及重大决策，提醒用户最终决定仍在自己手中。"
-      : "你是专业、亲切的宝石学知识助手。围绕给定的匹配类别，用简体中文正面回答用户的具体问题；除非用户询问鉴定，否则不要复述视觉识别原理。正文必须控制在100到180个汉字之间，优先用1到2个短段落；不要写标题、列表、开场白或结尾客套话。必须把最后一句写完整，禁止用省略号表示截断。明确区分视觉匹配与专业鉴定；不确定时直接说明，不虚构产地、价格、功效或真伪结论。";
+      ? language === "en"
+        ? "You are the StoneLens stone inspiration assistant. Write in warm, concrete English with gentle imagery, not vague motivational language. The user chooses one stone and may ask a question. Write about 85-110 English words. Start naturally; do not use fixed prefixes. Include three layers: 1) a specific image inspired by the stone name; 2) a response to the user's current question or state; 3) one small action they can take today. Do not predict the future, discuss luck, fate, romance, wealth, or destiny, and do not explain mineral properties. If the question involves a major decision, gently remind the user that the final decision remains theirs."
+        : "你是“石相 StoneLens”的石头启发助手，语气温和、有画面感，但不要空泛。用户会选择一颗石头，并可提出一个问题。请用简体中文写一段约95-120字的启发文字。自然开头即可，不要使用“什么石头提示您”这类固定前缀。内容需包含三层：1）结合石头名称产生一个具体意象；2）回应用户此刻的问题或状态；3）给出一个今天就能做的小行动建议。不要预测未来，不谈吉凶、财运、桃花、命运，不使用“注定”“一定会”等绝对词；不解释矿物物理属性；如果问题涉及重大决策，提醒用户最终决定仍在自己手中。"
+      : language === "en"
+        ? "You are a professional and friendly gemology knowledge assistant. Answer the user's specific question in English around the given visual match category. Unless the user asks about authentication, do not repeat the visual recognition method. Keep the answer concise, around 90-140 English words, in 1-2 short paragraphs. Do not write a title, list, greeting, or closing line. Distinguish visual matching from professional identification; when uncertain, say so directly and do not invent origin, price, effect, authenticity, or value claims."
+        : "你是专业、亲切的宝石学知识助手。围绕给定的匹配类别，用简体中文正面回答用户的具体问题；除非用户询问鉴定，否则不要复述视觉识别原理。正文必须控制在100到180个汉字之间，优先用1到2个短段落；不要写标题、列表、开场白或结尾客套话。必须把最后一句写完整，禁止用省略号表示截断。明确区分视觉匹配与专业鉴定；不确定时直接说明，不虚构产地、价格、功效或真伪结论。";
 
   const userPrompt =
     mode === "revelation"
-      ? `用户选择的石头：${gemName}\n用户想问的事：${question || "没有具体问题，只想获得一句此刻的启发。"}`
-      : `当前视觉匹配类别：${gemName}\n用户问题：${question}`;
+      ? language === "en"
+        ? `Selected stone: ${gemName}\nUser's question: ${question || "No specific question; they only want a gentle inspiration for this moment."}`
+        : `用户选择的石头：${gemName}\n用户想问的事：${question || "没有具体问题，只想获得一句此刻的启发。"}`
+      : language === "en"
+        ? `Current visual match category: ${gemName}\nUser question: ${question}`
+        : `当前视觉匹配类别：${gemName}\n用户问题：${question}`;
 
   try {
     const response = await fetch("https://api.deepseek.com/chat/completions", {
@@ -116,7 +136,7 @@ export async function POST(request: Request) {
     const rawAnswer = data.choices?.[0]?.message?.content?.trim();
     if (!rawAnswer) throw new Error("empty response");
     const answer = mode === "revelation" ? normalizeRevelationAnswer(rawAnswer) : rawAnswer;
-    return Response.json({ answer: keepCompleteAnswer(answer, mode) });
+    return Response.json({ answer: keepCompleteAnswer(answer, mode, language) });
   } catch {
     return Response.json({ error: "AI 服务连接失败，请稍后重试。" }, { status: 502 });
   }

@@ -17,7 +17,7 @@ function isStandalone() {
     || (navigator as Navigator & { standalone?: boolean }).standalone === true;
 }
 
-export default function PwaInstallPrompt() {
+export default function PwaInstallPrompt({ language = "zh" }: { language?: "zh" | "en" }) {
   const [deferredPrompt, setDeferredPrompt] = useState<DeferredInstallPrompt | null>(null);
   const [platform, setPlatform] = useState<"ios" | "android" | null>(null);
   const [hidden, setHidden] = useState(true);
@@ -72,24 +72,25 @@ export default function PwaInstallPrompt() {
   };
 
   if (hidden || !platform) return null;
+  const isEnglish = language === "en";
 
   return (
     <aside className="pwa-install-prompt" aria-live="polite">
       <span className="pwa-install-icon" aria-hidden="true">◇</span>
       <div>
-        <b>将 StoneLens 添加到主屏幕</b>
+        <b>{isEnglish ? "Add StoneLens to your home screen" : "将 StoneLens 添加到主屏幕"}</b>
         {platform === "ios" ? (
-          <small>在 Safari 点击“分享”，再选择“添加到主屏幕”，即可像 App 一样打开。</small>
+          <small>{isEnglish ? "In Safari, tap Share, then Add to Home Screen to open it like an app." : "在 Safari 点击“分享”，再选择“添加到主屏幕”，即可像 App 一样打开。"}</small>
         ) : (
-          <small>安装后可从手机桌面快速打开，获得更沉浸的全屏体验。</small>
+          <small>{isEnglish ? "Install it for quick home-screen access and a more immersive full-screen experience." : "安装后可从手机桌面快速打开，获得更沉浸的全屏体验。"}</small>
         )}
       </div>
       {platform === "android" && (
         <button className="pwa-install-action" onClick={install} disabled={installing}>
-          {installing ? "正在添加…" : "添加"}
+          {installing ? (isEnglish ? "Adding…" : "正在添加…") : (isEnglish ? "Add" : "添加")}
         </button>
       )}
-      <button className="pwa-install-close" aria-label="关闭安装提示" onClick={dismiss}>×</button>
+      <button className="pwa-install-close" aria-label={isEnglish ? "Close install prompt" : "关闭安装提示"} onClick={dismiss}>×</button>
     </aside>
   );
 }

@@ -72,7 +72,7 @@ async function ensureECharts(): Promise<ECharts> {
   return browserWindow.echarts;
 }
 
-export default function GemOriginMiniMap({ domain, className }: { domain: StoneDomain; className: string }) {
+export default function GemOriginMiniMap({ domain, className, language = "zh" }: { domain: StoneDomain; className: string; language?: "zh" | "en" }) {
   const root = useRef<HTMLDivElement>(null);
   const chartRef = useRef<Chart | null>(null);
   const baseOptionRef = useRef<unknown>(null);
@@ -97,7 +97,7 @@ export default function GemOriginMiniMap({ domain, className }: { domain: StoneD
       const baseOption = {
         tooltip: {
           trigger: "item",
-          formatter: (params: { name?: string }) => params.name ? bilingualCountryName(params.name) : "",
+          formatter: (params: { name?: string }) => params.name ? (language === "en" ? params.name : bilingualCountryName(params.name)) : "",
         },
         geo: {
           map: "stonelens-gem-origin",
@@ -133,7 +133,7 @@ export default function GemOriginMiniMap({ domain, className }: { domain: StoneD
       chart?.dispose();
       chartRef.current = null;
     };
-  }, [className, domain]);
+  }, [className, domain, language]);
 
   /* 优化：先清除漫游变换，再恢复与初始状态相同的完整配置。 */
   const resetView = () => {
@@ -146,8 +146,8 @@ export default function GemOriginMiniMap({ domain, className }: { domain: StoneD
 
   return (
     <div className="gem-origin-map-shell">
-      <div className="gem-origin-mini-map" ref={root} aria-label={`${className} 主要产地地图`} />
-      <button className="map-reset-button" onClick={resetView}>重置视角</button>
+      <div className="gem-origin-mini-map" ref={root} aria-label={language === "en" ? `${className} principal origin map` : `${className} 主要产地地图`} />
+      <button className="map-reset-button" onClick={resetView}>{language === "en" ? "Reset view" : "重置视角"}</button>
     </div>
   );
 }

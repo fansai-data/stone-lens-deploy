@@ -52,6 +52,37 @@ const birthstoneOrigins: Record<string, { countries: string; note: string }> = {
 const originFor = (english: string) =>
   birthstoneOrigins[english] ?? { countries: "主要产地资料整理中", note: "不同产地会影响颜色、包裹体与市场故事，建议结合证书或实物观察判断。" };
 
+const englishName = (value: string) => value.replaceAll("-", " ");
+
+const englishOriginCountries = (english: string) =>
+  (birthstoneOrigins[english]?.countries || "")
+    .split("、")
+    .map((part) => part.replace(/[\u4e00-\u9fff]/g, "").trim())
+    .filter(Boolean)
+    .join(", ") || "Origin data unavailable";
+
+const englishStoryFor = (item: Birthstone) =>
+  `${englishName(item.english)} is a traditional birthstone associated with ${englishMeaningFor(item)}. This English version keeps the story concise for international visitors while preserving the gentle, symbolic tone of the original section.`;
+
+const englishCareFor = (item: Birthstone) => {
+  if (/Pearl/.test(item.english)) return "Keep away from perfume, cosmetics and sweat. Wipe gently with a soft cloth after wearing.";
+  if (/Opal/.test(item.english)) return "Avoid heat, dryness and ultrasonic cleaning. Store gently and avoid sudden temperature changes.";
+  if (/Diamond|Ruby|Sapphire/.test(item.english)) return "Durable for daily wear, but avoid hard impact and clean with care.";
+  return "Avoid strong impact, harsh chemicals and prolonged exposure to intense heat or sunlight.";
+};
+
+const englishMeaningFor = (item: Birthstone) => {
+  const fallback: Record<string, string> = {
+    Diamond: "clarity, commitment and resilience",
+    Ruby: "passion, courage and vitality",
+    Pearl: "softness, grace and wholeness",
+    Amethyst: "calmness, clarity and inner balance",
+    Emerald: "renewal, hope and insight",
+    "Sapphire-Blue": "wisdom, loyalty and dignity",
+  };
+  return fallback[item.english] || "personal reflection and gentle inspiration";
+};
+
 const birthstoneStoryMore: Record<string, string> = {
   "Garnet-Red": "在维多利亚时期，波希米亚石榴石首饰曾风靡欧洲，密镶的小颗红石榴石像烛火一样铺满胸针、项链和戒指，也让它从护身符慢慢走入日常装饰。",
   Amethyst: "紫水晶在欧洲宗教首饰中也很常见，主教戒指常用紫色宝石来象征节制与精神清明；它既有神话的浪漫，也有一种安静、克制的仪式感。",
@@ -133,7 +164,8 @@ const months: MonthStory[] = [
 
 months.forEach((month) => { month.stones = [month.representative, ...month.stones]; });
 
-export default function BirthstoneStories() {
+export default function BirthstoneStories({ language = "zh" }: { language?: "zh" | "en" }) {
+  const isEnglish = language === "en";
   const [selected, setSelected] = useState<MonthStory | null>(null);
 
   const openMonth = (month: MonthStory) => {
@@ -144,8 +176,8 @@ export default function BirthstoneStories() {
   return (
     <section className="birthstone-stories" id="birthstones">
       <div className="birthstone-heading">
-        <div><span className="eyebrow">BIRTHSTONE STORIES · 生辰石趣闻</span><h2>十二个月，十二组宝石故事</h2></div>
-        <p>点击月份，查看该月生辰石的传说、保养建议、适配星座与象征意义。传说属于文化故事，不代表科学功效或购买建议。</p>
+        <div><span className="eyebrow">{isEnglish ? "BIRTHSTONE STORIES" : "BIRTHSTONE STORIES · 生辰石趣闻"}</span><h2>{isEnglish ? "Twelve months, twelve gemstone stories" : "十二个月，十二组宝石故事"}</h2></div>
+        <p>{isEnglish ? "Choose a month to explore its representative birthstones, symbolic meaning, origin notes and care tips. Stories are cultural references, not scientific claims or purchase advice." : "点击月份，查看该月生辰石的传说、保养建议、适配星座与象征意义。传说属于文化故事，不代表科学功效或购买建议。"}</p>
       </div>
       <div className="birthstone-month-grid">
         {months.map((month, index) => (
@@ -153,45 +185,45 @@ export default function BirthstoneStories() {
             key={month.englishMonth}
             className={selected?.englishMonth === month.englishMonth ? "is-active" : undefined}
             onClick={() => openMonth(month)}
-            aria-label={`查看${month.month}${month.englishMonth}生辰石详情`}
+            aria-label={isEnglish ? `View ${month.englishMonth} birthstone details` : `查看${month.month}${month.englishMonth}生辰石详情`}
             aria-pressed={selected?.englishMonth === month.englishMonth}
           >
-            <img src={month.representative.image} alt={`${month.month}生辰石 ${month.representative.name}`} loading="lazy" />
+            <img src={month.representative.image} alt={isEnglish ? `${month.englishMonth} birthstone ${englishName(month.representative.english)}` : `${month.month}生辰石 ${month.representative.name}`} loading="lazy" />
             <span>{String(index + 1).padStart(2, "0")}</span>
-            <div><small>{month.month} · {month.englishMonth}</small><b>{month.representative.name}</b><em>{month.representative.english.replaceAll("-", " ")}</em><i>EXPLORE STORY&nbsp; →</i></div>
+            <div><small>{isEnglish ? month.englishMonth : `${month.month} · ${month.englishMonth}`}</small><b>{isEnglish ? englishName(month.representative.english) : month.representative.name}</b><em>{isEnglish ? "" : month.representative.english.replaceAll("-", " ")}</em><i>{isEnglish ? "EXPLORE STORY" : "EXPLORE STORY"}&nbsp; →</i></div>
           </button>
         ))}
       </div>
       {selected && (
         <div className="birthstone-detail" id="birthstone-detail">
           <div className="birthstone-detail-head">
-            <div><span>{selected.englishMonth.toUpperCase()} BIRTHSTONES · 生辰石</span><h3>{selected.month}生辰石</h3></div>
+            <div><span>{isEnglish ? `${selected.englishMonth.toUpperCase()} BIRTHSTONES` : `${selected.englishMonth.toUpperCase()} BIRTHSTONES · 生辰石`}</span><h3>{isEnglish ? `${selected.englishMonth} Birthstones` : `${selected.month}生辰石`}</h3></div>
           </div>
           <div className="birthstone-detail-grid">
             {selected.stones.map((item) => {
               const origin = originFor(item.english);
               return (
               <article key={item.english}>
-                <img src={item.image} alt={`${item.name} ${item.english}`} loading="lazy" />
+                <img src={item.image} alt={isEnglish ? englishName(item.english) : `${item.name} ${item.english}`} loading="lazy" />
                 <div>
-                  <h4>{item.name}<small>{item.english.replaceAll("-", " ")}</small></h4>
-                  <p>{storyFor(item)}</p>
+                  <h4>{isEnglish ? englishName(item.english) : item.name}<small>{isEnglish ? "" : item.english.replaceAll("-", " ")}</small></h4>
+                  <p>{isEnglish ? englishStoryFor(item) : storyFor(item)}</p>
                   <dl>
-                    <div><dt>保养建议</dt><dd>{item.care}</dd></div>
-                    <div><dt>适配星座</dt><dd>{item.zodiac}</dd></div>
-                    <div className="birthstone-origin"><dt>主要产地</dt><dd>{origin.countries}</dd></div>
+                    <div><dt>{isEnglish ? "Care tips" : "保养建议"}</dt><dd>{isEnglish ? englishCareFor(item) : item.care}</dd></div>
+                    <div><dt>{isEnglish ? "Zodiac season" : "适配星座"}</dt><dd>{isEnglish ? item.zodiac.replace(/[\u4e00-\u9fff·（）：]/g, "").trim() : item.zodiac}</dd></div>
+                    <div className="birthstone-origin"><dt>{isEnglish ? "Principal origins" : "主要产地"}</dt><dd>{isEnglish ? englishOriginCountries(item.english) : origin.countries}</dd></div>
                   </dl>
                   <div className="birthstone-extra">
-                    <b>象征：{item.meaning}</b>
-                    <span>{origin.note}</span>
-                    <span>{legacyFor(item.english)}</span>
+                    <b>{isEnglish ? `Symbolism: ${englishMeaningFor(item)}` : `象征：${item.meaning}`}</b>
+                    <span>{isEnglish ? "Origin, color and inclusions vary by source. For buying or appraisal, combine visual reference with a certificate or expert inspection." : origin.note}</span>
+                    <span>{isEnglish ? "Cultural note: birthstone stories are symbolic traditions rather than guaranteed effects." : legacyFor(item.english)}</span>
                   </div>
                 </div>
               </article>
             );})}
           </div>
-          <button className="birthstone-collapse-bottom" onClick={() => setSelected(null)}>收起详情 ×</button>
-          <a href="https://www.gia.edu/birthstones" target="_blank" rel="noreferrer">资料参考：GIA 生辰石指南 ↗</a>
+          <button className="birthstone-collapse-bottom" onClick={() => setSelected(null)}>{isEnglish ? "Close details ×" : "收起详情 ×"}</button>
+          <a href="https://www.gia.edu/birthstones" target="_blank" rel="noreferrer">{isEnglish ? "Reference: GIA Birthstone Guide ↗" : "资料参考：GIA 生辰石指南 ↗"}</a>
         </div>
       )}
     </section>

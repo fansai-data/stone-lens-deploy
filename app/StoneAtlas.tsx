@@ -46,15 +46,24 @@ const categories: Array<{
   name: string;
   english: string;
   description: string;
+  englishDescription: string;
   cover: string;
 }> = [
   /* 优化：三个主分类各自使用用户提供的视觉封面。 */
-  { domain: "gemstone", count: 87, name: "彩色宝石", english: "COLORED GEMSTONES", description: "从钻石、红蓝宝石到小众彩宝", cover: sitePath("/atlas-covers/gemstones-cover.webp") },
-  { domain: "jade_raw", count: 10, name: "玉石原石", english: "RAW JADE", description: "保留皮壳、纹理与天然形态", cover: sitePath("/atlas-covers/jade-raw-cover.webp") },
-  { domain: "common_rock", count: 9, name: "普通岩石", english: "COMMON ROCKS", description: "帮助排除外观相近的普通石头", cover: sitePath("/atlas-covers/common-rock-cover.webp") },
+  { domain: "gemstone", count: 87, name: "彩色宝石", english: "COLORED GEMSTONES", description: "从钻石、红蓝宝石到小众彩宝", englishDescription: "From diamonds and classic sapphires to niche colored gems", cover: sitePath("/atlas-covers/gemstones-cover.webp") },
+  { domain: "jade_raw", count: 10, name: "玉石原石", english: "RAW JADE", description: "保留皮壳、纹理与天然形态", englishDescription: "Rough jade with natural skin, texture and raw form", cover: sitePath("/atlas-covers/jade-raw-cover.webp") },
+  { domain: "common_rock", count: 9, name: "普通岩石", english: "COMMON ROCKS", description: "帮助排除外观相近的普通石头", englishDescription: "Common rocks used as negative samples for comparison", cover: sitePath("/atlas-covers/common-rock-cover.webp") },
 ];
 
-export default function StoneAtlas() {
+const englishHardness = (value: string) => value
+  .replaceAll("暂无可靠统一数值", "No reliable unified value")
+  .replaceAll("随组成矿物而变化", "Varies by mineral composition")
+  .replaceAll("方向相关", "direction-dependent")
+  .replaceAll("莫氏约", "Mohs approx. ")
+  .replaceAll("莫氏", "Mohs");
+
+export default function StoneAtlas({ language = "zh" }: { language?: "zh" | "en" }) {
+  const isEnglish = language === "en";
   const [items, setItems] = useState<AtlasItem[]>([]);
   const [activeDomain, setActiveDomain] = useState<StoneDomain | null>(null);
   /* 优化：展开图鉴后支持按中英文快速搜索，方便在 106 个类别中定位石种。 */
@@ -108,11 +117,11 @@ export default function StoneAtlas() {
     const query = atlasQuery.trim().toLowerCase();
     if (!query) return visibleItems;
     return visibleItems.filter((item) => {
-      const chinese = chineseNameForStone(item.className).toLowerCase();
+      const chinese = isEnglish ? "" : chineseNameForStone(item.className).toLowerCase();
       const english = item.className.toLowerCase();
       return chinese.includes(query) || english.includes(query);
     });
-  }, [atlasQuery, visibleItems]);
+  }, [atlasQuery, isEnglish, visibleItems]);
   const displayedItems = useMemo(
     () => filteredItems.slice(0, visibleLimit),
     [filteredItems, visibleLimit],
@@ -130,10 +139,10 @@ export default function StoneAtlas() {
       <div className="atlas-heading">
         <div>
           <span className="eyebrow">STONE ATLAS</span>
-          <h2>石种图鉴</h2>
+          <h2>{isEnglish ? "Stone Atlas" : "石种图鉴"}</h2>
         </div>
         {/* 优化 */}
-        <p>覆盖 87 种宝石、10 种玉石原石和 9 种岩石；AI 快速识别，上传图片即可识别。</p>
+        <p>{isEnglish ? "Browse 87 gemstone categories, 10 raw jade categories and 9 common rock categories. Upload an image to start visual matching." : "覆盖 87 种宝石、10 种玉石原石和 9 种岩石；AI 快速识别，上传图片即可识别。"}</p>
       </div>
 
       <div className="atlas-category-grid">
@@ -151,9 +160,9 @@ export default function StoneAtlas() {
             {/* 优化：封面图位于文字下方，CSS 渐变遮罩保证信息可读。 */}
             <img className="atlas-category-cover" src={category.cover} alt="" aria-hidden="true" />
             <span>{category.english}</span>
-            <b><strong>{category.count}</strong> 种 {category.name}</b>
-            <small>{category.description}</small>
-            <i>{activeDomain === category.domain ? "收起详情 −" : "展开图鉴 +"}</i>
+            <b><strong>{category.count}</strong> {isEnglish ? category.english.toLowerCase() : `种 ${category.name}`}</b>
+            <small>{isEnglish ? category.englishDescription : category.description}</small>
+            <i>{activeDomain === category.domain ? (isEnglish ? "Collapse −" : "收起详情 −") : (isEnglish ? "Open atlas +" : "展开图鉴 +")}</i>
           </button>
         ))}
       </div>
@@ -161,12 +170,12 @@ export default function StoneAtlas() {
       {activeDomain && (
         <div className="atlas-details">
           <div className="atlas-details-head">
-            <div><span>{activeCategory?.english}</span><h3>{activeCategory?.name}</h3></div>
-            <b>{atlasQuery ? `${filteredItems.length} / ${visibleItems.length} 个类别` : `${visibleItems.length} 个类别`}</b>
+            <div><span>{activeCategory?.english}</span><h3>{isEnglish ? activeCategory?.english.replaceAll("_", " ") : activeCategory?.name}</h3></div>
+            <b>{atlasQuery ? `${filteredItems.length} / ${visibleItems.length} ${isEnglish ? "categories" : "个类别"}` : `${visibleItems.length} ${isEnglish ? "categories" : "个类别"}`}</b>
           </div>
           <div className="atlas-search-row">
             <label>
-              <span>快速查找 · QUICK SEARCH</span>
+              <span>{isEnglish ? "QUICK SEARCH" : "快速查找 · QUICK SEARCH"}</span>
               <input
                 value={atlasQuery}
                 onChange={(event) => {
@@ -174,27 +183,27 @@ export default function StoneAtlas() {
                   setVisibleLimit(24);
                   setAtlasQuery(event.target.value);
                 }}
-                placeholder="输入中文或英文，例如：红宝石 / Ruby / Quartz"
+                placeholder={isEnglish ? "Search in English, e.g. Ruby / Quartz / Jade" : "输入中文或英文，例如：红宝石 / Ruby / Quartz"}
               />
             </label>
-            {atlasQuery && <button type="button" onClick={() => { setVisibleLimit(24); setAtlasQuery(""); }}>清除</button>}
+            {atlasQuery && <button type="button" onClick={() => { setVisibleLimit(24); setAtlasQuery(""); }}>{isEnglish ? "Clear" : "清除"}</button>}
           </div>
           <div className="atlas-stone-grid">
             {displayedItems.map((item) => (
               <article key={`${item.domain}-${item.className}`}>
-                <img src={item.image} alt={`${chineseNameForStone(item.className)} ${item.className}`} loading="lazy" decoding="async" />
-                <div><b>{chineseNameForStone(item.className)}</b><small>{item.className}</small></div>
+                <img src={item.image} alt={`${item.className} reference`} loading="lazy" decoding="async" />
+                <div><b>{isEnglish ? item.className : chineseNameForStone(item.className)}</b><small>{isEnglish ? "" : item.className}</small></div>
                 {/* 优化：图鉴卡片悬停时显示硬度和主要产地，增强 106 类图鉴的知识属性。 */}
                 <aside className="atlas-stone-hover">
-                  <span>硬度 · HARDNESS</span>
-                  <b>{hardnessForStone(item.domain, item.className)}</b>
-                  <span>主要产地 · ORIGINS</span>
+                  <span>{isEnglish ? "HARDNESS" : "硬度 · HARDNESS"}</span>
+                  <b>{isEnglish ? englishHardness(hardnessForStone(item.domain, item.className)) : hardnessForStone(item.domain, item.className)}</b>
+                  <span>{isEnglish ? "ORIGINS" : "主要产地 · ORIGINS"}</span>
                   <p>
                     {countriesForStone(item.domain, item.className)
                       /* 优化：图鉴悬停层只展示 1–2 个代表产地，避免信息过密压住图片。 */
                       .slice(0, 2)
-                      .map((country) => bilingualCountryName(country))
-                      .join(" / ") || "暂无产地资料"}
+                      .map((country) => isEnglish ? country : bilingualCountryName(country))
+                      .join(" / ") || (isEnglish ? "Origin data unavailable" : "暂无产地资料")}
                   </p>
                 </aside>
               </article>
@@ -202,17 +211,17 @@ export default function StoneAtlas() {
           </div>
           {filteredItems.length === 0 && (
             <div className="atlas-empty-result">
-              <b>没有找到对应石种</b>
-              <p>可以尝试输入更短的关键词，例如 Ruby、Quartz、玉、岩石。</p>
+              <b>{isEnglish ? "No matching stone found" : "没有找到对应石种"}</b>
+              <p>{isEnglish ? "Try a shorter keyword, such as Ruby, Quartz, Jade or Rock." : "可以尝试输入更短的关键词，例如 Ruby、Quartz、玉、岩石。"}</p>
             </div>
           )}
           {displayedItems.length < filteredItems.length && (
             <button className="atlas-load-more-button" onClick={() => setVisibleLimit((current) => current + 24)}>
-              加载更多 · {displayedItems.length} / {filteredItems.length}
+              {isEnglish ? "Load more" : "加载更多"} · {displayedItems.length} / {filteredItems.length}
             </button>
           )}
           {/* 优化 */}
-          <button className="atlas-collapse-button" onClick={collapseAtlas}>收起详情 ↑</button>
+          <button className="atlas-collapse-button" onClick={collapseAtlas}>{isEnglish ? "Collapse ↑" : "收起详情 ↑"}</button>
         </div>
       )}
     </section>

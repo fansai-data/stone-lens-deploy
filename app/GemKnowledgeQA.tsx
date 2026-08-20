@@ -16,9 +16,17 @@ const quickQuestions = [
   "它常见的主要产地和颜色特点是什么？",
 ];
 
+const quickQuestionsEn = [
+  "How should I care for this stone in daily wear or collecting?",
+  "What type of jewelry is it suitable for?",
+  "What visual features can beginners use to recognize it?",
+  "What are its common origins and color characteristics?",
+];
+
 type GemChatRequest = {
   gemName: string;
   question: string;
+  language?: "zh" | "en";
 };
 
 type GemChatSuccess = {
@@ -45,15 +53,20 @@ export default function GemKnowledgeQA({
   currentGemName,
   isMember,
   onOpenMembership,
+  language = "zh",
 }: {
   currentGemName?: string;
   isMember: boolean;
   onOpenMembership: () => void;
+  language?: "zh" | "en";
 }) {
   const [question, setQuestion] = useState("");
   const [validationError, setValidationError] = useState<string | null>(null);
   const requestTimes = useRef<number[]>([]);
   const questionMutation = useMutation({ mutationFn: askGemKnowledge });
+  const isEnglish = language === "en";
+  const prompts = isEnglish ? quickQuestionsEn : quickQuestions;
+  const currentStoneLabel = currentGemName ? (isEnglish ? currentGemName : `${chineseNameForStone(currentGemName)} · ${currentGemName}`) : (isEnglish ? "the recognition result" : "识别结果");
 
   const ask = (event: FormEvent) => {
     event.preventDefault();
@@ -61,22 +74,22 @@ export default function GemKnowledgeQA({
     questionMutation.reset();
     if (!isMember) return;
     if (!currentGemName) {
-      setValidationError("请先完成一次石头识别，再向 AI 提问。");
+      setValidationError(isEnglish ? "Please complete one stone identification before asking AI." : "请先完成一次石头识别，再向 AI 提问。");
       return;
     }
     const trimmed = question.trim();
     if (!trimmed) {
-      setValidationError("请输入你想了解的问题。");
+      setValidationError(isEnglish ? "Please enter a question first." : "请输入你想了解的问题。");
       return;
     }
     const now = Date.now();
     requestTimes.current = requestTimes.current.filter((timestamp) => now - timestamp < 60_000);
     if (requestTimes.current.length >= 3) {
-      setValidationError("每分钟最多提问 3 次，请稍后再试。");
+      setValidationError(isEnglish ? "You can ask up to 3 questions per minute. Please try again later." : "每分钟最多提问 3 次，请稍后再试。");
       return;
     }
     requestTimes.current.push(now);
-    questionMutation.mutate({ gemName: currentGemName, question: trimmed });
+    questionMutation.mutate({ gemName: currentGemName, question: trimmed, language });
   };
 
   const error = validationError ?? questionMutation.error?.message;
@@ -84,20 +97,20 @@ export default function GemKnowledgeQA({
   const loading = questionMutation.isPending;
 
   return (
-    <section className={`gem-qa ${isMember ? "" : "is-locked"}`} aria-label="AI 宝石知识问答">
+    <section className={`gem-qa ${isMember ? "" : "is-locked"}`} aria-label={isEnglish ? "AI gem knowledge Q&A" : "AI 宝石知识问答"}>
       <div className="gem-qa-intro">
-        <div><span className="eyebrow">AI GEMOLOGY ASSISTANT</span><h3>继续了解 {currentGemName ? `${chineseNameForStone(currentGemName)} · ${currentGemName}` : "识别结果"}</h3></div>
+        <div><span className="eyebrow">AI GEMOLOGY ASSISTANT</span><h3>{isEnglish ? `Learn more about ${currentStoneLabel}` : `继续了解 ${currentStoneLabel}`}</h3></div>
         {/* 优化：保留模型与限流说明，不向用户展示内部回答长度约束。 */}
-        <small>DeepSeek V4 Flash · 每分钟最多 3 次</small>
+        <small>{isEnglish ? "DeepSeek V4 Flash · up to 3 questions per minute" : "DeepSeek V4 Flash · 每分钟最多 3 次"}</small>
       </div>
       {!isMember && (
         <div className="gem-qa-member-notice">
-          <div><b>该功能为会员专属</b><span>开通会员后可使用 AI 宝石知识问答</span></div>
-          <button className="secondary-button" onClick={onOpenMembership}>查看会员权益</button>
+          <div><b>{isEnglish ? "Members only" : "该功能为会员专属"}</b><span>{isEnglish ? "Unlock membership to use AI gem Q&A" : "开通会员后可使用 AI 宝石知识问答"}</span></div>
+          <button className="secondary-button" onClick={onOpenMembership}>{isEnglish ? "View membership" : "查看会员权益"}</button>
         </div>
       )}
-      <div className="gem-qa-prompts" aria-label="快捷提问">
-        {quickQuestions.map((prompt) => (
+      <div className="gem-qa-prompts" aria-label={isEnglish ? "Quick questions" : "快捷提问"}>
+        {prompts.map((prompt) => (
           <button
             type="button"
             key={prompt}
@@ -118,25 +131,25 @@ export default function GemKnowledgeQA({
           value={question}
           maxLength={300}
           onChange={(event) => setQuestion(event.target.value)}
-          placeholder="例如：这种宝石日常佩戴时需要注意什么？"
-          aria-label="向 AI 提问"
+          placeholder={isEnglish ? "Example: What should I know before wearing this stone?" : "例如：这种宝石日常佩戴时需要注意什么？"}
+          aria-label={isEnglish ? "Ask AI a question" : "向 AI 提问"}
           disabled={!isMember}
         />
         <button className="primary-button" disabled={!isMember || loading}>
           {loading ? (
-            <span className="ai-typing-dots" aria-label="AI 正在思考">
+            <span className="ai-typing-dots" aria-label={isEnglish ? "AI is thinking" : "AI 正在思考"}>
               <i /><i /><i />
             </span>
           ) : (
-            "询问 AI"
+            isEnglish ? "Ask AI" : "询问 AI"
           )}
         </button>
       </form>
       {loading && (
         <div className="gem-qa-answer gem-qa-loading" aria-live="polite">
-          <b>DeepSeek V4 Flash 正在思考</b>
+          <b>{isEnglish ? "DeepSeek V4 Flash is thinking" : "DeepSeek V4 Flash 正在思考"}</b>
           <p className="ai-thinking-text">
-            <span>正在检索宝石知识库</span>
+            <span>{isEnglish ? "Searching gem knowledge" : "正在检索宝石知识库"}</span>
             <span className="ai-typing-dots inline">
               <i /><i /><i />
             </span>
@@ -145,11 +158,11 @@ export default function GemKnowledgeQA({
       )}
       {!loading && (answer || error) && (
         <div className={`gem-qa-answer ${error ? "error" : ""}`} aria-live="polite">
-          <b>{error ? "暂时无法回答" : "DeepSeek V4 Flash"}</b>
+          <b>{error ? (isEnglish ? "Unable to answer right now" : "暂时无法回答") : "DeepSeek V4 Flash"}</b>
           <p>{error || answer}</p>
         </div>
       )}
-      <small className="gem-qa-note">AI 内容用于知识探索，不提供真伪、价值或医学功效判断。</small>
+      <small className="gem-qa-note">{isEnglish ? "AI content is for knowledge exploration only. It does not judge authenticity, value or medical effects." : "AI 内容用于知识探索，不提供真伪、价值或医学功效判断。"}</small>
     </section>
   );
 }

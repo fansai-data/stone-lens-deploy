@@ -9,12 +9,13 @@ type ImageCropperProps = {
   imageUrl: string;
   onApply: (croppedImage: string) => void;
   onCancel: () => void;
+  language?: "zh" | "en";
 };
 
 const MIN_SIZE = 48;
 
 /* 优化：轻量 Canvas 框选器，鼠标与手机触屏均可操作，不引入额外前端依赖。 */
-export default function ImageCropper({ imageUrl, onApply, onCancel }: ImageCropperProps) {
+export default function ImageCropper({ imageUrl, onApply, onCancel, language = "zh" }: ImageCropperProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imageRef = useRef<HTMLImageElement | null>(null);
   const dragRef = useRef<{ mode: DragMode; startX: number; startY: number; startBox: CropBox } | null>(null);
@@ -195,11 +196,11 @@ export default function ImageCropper({ imageUrl, onApply, onCancel }: ImageCropp
       <div className="cropper-dialog">
         <div className="cropper-heading">
           <div>
-            <span>步骤 2 / 2</span>
-            <h3 id="cropper-title">框选需要识别的石头</h3>
-            <p>拖动框内可移动，拖动四角可调整大小；尽量排除手部和复杂背景。</p>
+            <span>{language === "en" ? "Step 2 / 2" : "步骤 2 / 2"}</span>
+            <h3 id="cropper-title">{language === "en" ? "Select the stone area" : "框选需要识别的石头"}</h3>
+            <p>{language === "en" ? "Drag inside the box to move it, or drag the corners to resize. Try to exclude hands and complex backgrounds." : "拖动框内可移动，拖动四角可调整大小；尽量排除手部和复杂背景。"}</p>
           </div>
-          <button type="button" className="cropper-close" onClick={onCancel} aria-label="关闭裁剪">×</button>
+          <button type="button" className="cropper-close" onClick={onCancel} aria-label={language === "en" ? "Close cropper" : "关闭裁剪"}>×</button>
         </div>
         <div className="cropper-canvas-shell">
           <canvas
@@ -208,14 +209,14 @@ export default function ImageCropper({ imageUrl, onApply, onCancel }: ImageCropp
             onPointerMove={handlePointerMove}
             onPointerUp={handlePointerUp}
             onPointerCancel={handlePointerUp}
-            aria-label="石头图片裁剪区域"
+            aria-label={language === "en" ? "Stone image crop area" : "石头图片裁剪区域"}
           />
         </div>
         <div className="cropper-actions">
-          <button type="button" className="cropper-text-button" onClick={selectFullImage}>使用整张图片</button>
+          <button type="button" className="cropper-text-button" onClick={selectFullImage}>{language === "en" ? "Use full image" : "使用整张图片"}</button>
           <div>
-            <button type="button" className="secondary-button" onClick={onCancel}>取消</button>
-            <button type="button" className="primary-button" onClick={applyCrop} disabled={!ready}>使用框选区域</button>
+            <button type="button" className="secondary-button" onClick={onCancel}>{language === "en" ? "Cancel" : "取消"}</button>
+            <button type="button" className="primary-button" onClick={applyCrop} disabled={!ready}>{language === "en" ? "Use selected area" : "使用框选区域"}</button>
           </div>
         </div>
       </div>
