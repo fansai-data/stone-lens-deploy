@@ -110,7 +110,9 @@ export default function DivinationPage() {
 
   useEffect(() => {
     const storedLanguage = window.localStorage.getItem("stonelens-language");
-    if (storedLanguage === "zh" || storedLanguage === "en") setLanguage(storedLanguage);
+    if (storedLanguage !== "zh" && storedLanguage !== "en") return;
+    const animationFrame = window.requestAnimationFrame(() => setLanguage(storedLanguage));
+    return () => window.cancelAnimationFrame(animationFrame);
   }, []);
 
   useEffect(() => {
